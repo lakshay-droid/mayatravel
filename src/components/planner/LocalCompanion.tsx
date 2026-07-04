@@ -223,37 +223,57 @@ export const LocalCompanion: React.FC<LocalCompanionProps> = ({ city, compact = 
         </h4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {insights.hiddenGems.map((gem) => {
+          {insights.hiddenGems.map((gem, gemIdx) => {
             const reasons = getRecommendationReason(gem.name);
+            // Cycle through curated travel photos for visual variety
+            const GEM_PHOTOS = [
+              'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=600&q=80',
+              'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80',
+              'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=600&q=80',
+              'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80',
+            ];
+            const photoUrl = GEM_PHOTOS[gemIdx % GEM_PHOTOS.length];
             return (
               <motion.div
                 key={gem.name}
                 whileHover={{ y: -3 }}
-                className="glass-effect rounded-3xl p-6 border border-slate-100 shadow-premium flex flex-col justify-between gap-4"
+                className="glass-effect rounded-3xl border border-slate-100 shadow-premium flex flex-col justify-between overflow-hidden gap-0"
               >
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-start justify-between">
-                    <h5 className="font-extrabold text-base text-slate-800 tracking-tight flex items-center gap-1.5">
-                      <MapPin size={16} className="text-primary" aria-hidden="true" /> {gem.name}
+                {/* Gem photo header */}
+                <div className="relative h-36 overflow-hidden">
+                  <img
+                    src={photoUrl}
+                    alt={gem.name}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                    loading="lazy"
+                    fetchPriority="low"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/50" />
+                  <div className="absolute bottom-3 left-4">
+                    <h5 className="font-extrabold text-sm text-white tracking-tight flex items-center gap-1.5 drop-shadow">
+                      <MapPin size={13} className="text-primary" aria-hidden="true" /> {gem.name}
                     </h5>
-                    <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
+                    <span className="text-[10px] font-bold text-white/70 bg-black/30 px-2 py-0.5 rounded-full backdrop-blur-sm">
                       {gem.distance} away
                     </span>
                   </div>
+                </div>
+
+                <div className="p-5 flex flex-col gap-3">
                   <p className="text-xs text-slate-600 leading-relaxed font-semibold">
                     {gem.description}
                   </p>
                   <div className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <strong>Why locals love it:</strong> {gem.whyLocalsLove}
                   </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-3 border-t border-slate-100">
-                  {reasons.map((reason) => (
-                    <Badge key={reason} variant="primary">
-                      ✔ {reason}
-                    </Badge>
-                  ))}
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                    {reasons.map((reason) => (
+                      <Badge key={reason} variant="primary">
+                        ✔ {reason}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             );

@@ -56,6 +56,14 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({
         return;
       }
 
+      // Fast path: check localStorage onboarding flag first (set by Onboarding.tsx on completion)
+      const localOnboarded = localStorage.getItem(`onboarded_${user.username}`);
+      if (localOnboarded === '1') {
+        setHasPreferences(true);
+        setCheckingPreferences(false);
+        return;
+      }
+
       try {
         const { data, error } = await supabase
           .from('travel_preferences')
@@ -64,6 +72,8 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({
 
         if (!error && data && data.length > 0) {
           setHasPreferences(true);
+          // Sync localStorage so future checks are instant
+          localStorage.setItem(`onboarded_${user.username}`, '1');
         } else {
           setHasPreferences(false);
         }

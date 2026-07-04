@@ -78,6 +78,7 @@ export const AttractionSheet: React.FC<AttractionSheetProps> = ({ attraction, on
                 className="w-full h-full object-cover"
                 loading="lazy"
                 fetchPriority="low"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               <div className="absolute inset-0 photo-overlay" />
               <button

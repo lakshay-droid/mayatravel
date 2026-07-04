@@ -56,6 +56,7 @@ export const AttractionCard = React.memo(({ attraction, onTap, index = 0 }: Attr
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
           fetchPriority="low"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
         <div className="absolute inset-0 photo-overlay" />
 

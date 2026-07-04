@@ -14,7 +14,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Malsi Deer Park", "Sahastradhara"],
       visitDuration: "2 hours",
       difficulty: "Moderate",
-      photo: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Section_of_Robber_Cave_Dehradun_Uttarakhand_India.jpg"
     },
     {
       id: "deb-2",
@@ -28,7 +28,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Clement Town Bazaar"],
       visitDuration: "1.5 hours",
       difficulty: "Easy",
-      photo: "https://images.unsplash.com/photo-1604580864964-0462f5d5b1a8?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/5/50/Great_stupa_in_Mindroling.jpg"
     },
     {
       id: "deb-3",
@@ -42,7 +42,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Tapkeshwar Temple"],
       visitDuration: "2.5 hours",
       difficulty: "Easy",
-      photo: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Forest_research_institute-_dehradun-_uttrakhand-_DSC_001.jpg/960px-Forest_research_institute-_dehradun-_uttrakhand-_DSC_001.jpg"
     },
     {
       id: "deb-4",
@@ -56,7 +56,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Forest Research Institute"],
       visitDuration: "1 hour",
       difficulty: "Easy",
-      photo: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Hanuman_Idol_at_Tapkeshwar_Temple..jpg"
     },
     {
       id: "deb-5",
@@ -70,7 +70,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Sahastradhara"],
       visitDuration: "3 hours",
       difficulty: "Easy",
-      photo: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/1/10/Song_River_Maldevta_Dehradun.jpg"
     },
     {
       id: "deb-6",
@@ -84,7 +84,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Paltan Bazaar"],
       visitDuration: "45 mins",
       difficulty: "Easy",
-      photo: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Kachori_MA23.jpg/960px-Kachori_MA23.jpg"
     }
   ],
   "jaipur": [
@@ -100,7 +100,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["City Palace", "Jantar Mantar"],
       visitDuration: "1 hour",
       difficulty: "Easy",
-      photo: "https://images.unsplash.com/photo-1477584308802-e9c378852d92?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Hawa_Mahal%2C_Jaipur.jpg/960px-Hawa_Mahal%2C_Jaipur.jpg"
     },
     {
       id: "jai-2",
@@ -114,7 +114,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Sisodia Rani Garden"],
       visitDuration: "2 hours",
       difficulty: "Moderate",
-      photo: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Zanana_Kund_Aur_Galta_Ji_Ka_Mandir_-_edited.jpg"
     },
     {
       id: "jai-3",
@@ -128,7 +128,7 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Anokhi Museum of Block Printing", "Amber Fort"],
       visitDuration: "45 mins",
       difficulty: "Easy",
-      photo: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/b/b1/20191219_Panna_Meena_ka_Kund_step_well%2C_Amber%2C_Jaipur%2C_1130_9630.jpg"
     },
     {
       id: "jai-4",
@@ -142,7 +142,207 @@ export const ATTRACTIONS_BY_CITY: Record<string, Attraction[]> = {
       nearbyAttractions: ["Jaigarh Fort"],
       visitDuration: "3 hours",
       difficulty: "Challenging",
-      photo: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80"
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Jaipur%2C_Madhvendra_Palace.jpg/960px-Jaipur%2C_Madhvendra_Palace.jpg"
+    },
+    {
+      id: "jai-5",
+      name: "Amer Fort",
+      lat: 26.9854,
+      lng: 75.8513,
+      category: "Culture",
+      description: "A majestic hilltop fortress overlooking Maota Lake, famous for its artistic Hindu elements, massive ramparts, and the Sheesh Mahal (mirror palace).",
+      openingHours: "09:00 AM - 06:00 PM",
+      bestTime: "Late afternoon",
+      nearbyAttractions: ["Panna Meena ka Kund", "Jaigarh Fort"],
+      visitDuration: "2 hours",
+      difficulty: "Moderate",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/20191219_Fort_Amber%2C_Amer%2C_Jaipur_0955_9481.jpg/960px-20191219_Fort_Amber%2C_Amer%2C_Jaipur_0955_9481.jpg"
+    },
+    {
+      id: "jai-6",
+      name: "Albert Hall Museum",
+      lat: 26.9116,
+      lng: 75.8193,
+      category: "Museums",
+      description: "The oldest state museum in Rajasthan, showcasing a rich collection of artifacts, local paintings, carpets, and an Egyptian mummy.",
+      openingHours: "09:00 AM - 05:00 PM, 07:00 PM - 10:00 PM",
+      bestTime: "Night viewing hours",
+      nearbyAttractions: ["Jaipur Zoo"],
+      visitDuration: "1.5 hours",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Albert_Hall_Museum_Jaipur.jpg/800px-Albert_Hall_Museum_Jaipur.jpg"
+    }
+  ],
+  "varanasi": [
+    {
+      id: "var-1",
+      name: "Dashashwamedh Ghat",
+      lat: 25.3072,
+      lng: 83.0101,
+      category: "Culture",
+      description: "The spiritual center of Varanasi, famous for its daily evening Ganga Aarti ceremony where priests perform rhythmic rituals of light and fire.",
+      openingHours: "Open 24 Hours (Aarti at 06:30 PM)",
+      bestTime: "Sunset / Evening Aarti hours",
+      nearbyAttractions: ["Kashi Vishwanath Temple", "Manikarnika Ghat"],
+      visitDuration: "1.5 hours",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Aarti%2C_Ganga_Aarti_at_Dashashwamedh_Ghat%2C_Varanasi.jpg/800px-Aarti%2C_Ganga_Aarti_at_Dashashwamedh_Ghat%2C_Varanasi.jpg"
+    },
+    {
+      id: "var-2",
+      name: "Kashi Vishwanath Temple",
+      lat: 25.3109,
+      lng: 83.0102,
+      category: "Temples",
+      description: "One of the most famous Hindu temples, dedicated to Lord Shiva (Vishwanatha) and standing on the western bank of the holy Ganges.",
+      openingHours: "04:00 AM - 11:00 PM",
+      bestTime: "Early morning",
+      nearbyAttractions: ["Dashashwamedh Ghat"],
+      visitDuration: "1 hour",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Kashi_Vishwanath_Temple.jpg/800px-Kashi_Vishwanath_Temple.jpg"
+    },
+    {
+      id: "var-3",
+      name: "Sarnath Buddhist Site",
+      lat: 25.3762,
+      lng: 83.0223,
+      category: "Culture",
+      description: "The historical park where Gautama Buddha first taught the Dharma after attaining enlightenment, featuring the ancient Dhamek Stupa.",
+      openingHours: "06:00 AM - 06:00 PM",
+      bestTime: "October to March",
+      nearbyAttractions: ["Sarnath Archaeological Museum"],
+      visitDuration: "2 hours",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Dhamek_Stupa.jpg/800px-Dhamek_Stupa.jpg"
+    },
+    {
+      id: "var-4",
+      name: "Kachori Gali",
+      lat: 25.3115,
+      lng: 83.0118,
+      category: "Food",
+      description: "A narrow alleyway in old Varanasi famous for street stalls serving legendary kachori-sabzi and steaming hot jalebi since generations.",
+      openingHours: "07:00 AM - 01:00 PM",
+      bestTime: "Morning Breakfast hours",
+      nearbyAttractions: ["Vishwanath Gali"],
+      visitDuration: "45 mins",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Kachori_MA23.jpg/960px-Kachori_MA23.jpg"
+    },
+    {
+      id: "var-5",
+      name: "Ramnagar Fort",
+      lat: 25.2679,
+      lng: 83.0272,
+      category: "Hidden Gems",
+      description: "A majestic 18th-century sandstone fortress on the eastern bank of the Ganges, featuring a vintage museum of royal cars and weapons.",
+      openingHours: "10:00 AM - 05:00 PM",
+      bestTime: "November to February",
+      nearbyAttractions: ["Vyas Temple"],
+      visitDuration: "1.5 hours",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Ramnagar_Fort_Varanasi.jpg/800px-Ramnagar_Fort_Varanasi.jpg"
+    },
+    {
+      id: "var-6",
+      name: "Lakhaniya Dari Waterfall",
+      lat: 24.9687,
+      lng: 83.0763,
+      category: "Adventure",
+      description: "A hidden waterfall and forest trekking trail located in the Vindhyan hills outside the city, popular for adventure picnics.",
+      openingHours: "06:00 AM - 05:00 PM",
+      bestTime: "Monsoon Season (July to September)",
+      nearbyAttractions: ["Chunar Fort"],
+      visitDuration: "3 hours",
+      difficulty: "Moderate",
+      photo: "https://images.unsplash.com/photo-1509909756405-be0199881695?auto=format&fit=crop&w=600&q=80"
+    }
+  ],
+  "goa": [
+    {
+      id: "goa-1",
+      name: "Basilica of Bom Jesus",
+      lat: 15.5009,
+      lng: 73.9116,
+      category: "Culture",
+      description: "A UNESCO World Heritage site holding the mortal remains of St. Francis Xavier, featuring gorgeous Baroque Architecture.",
+      openingHours: "09:00 AM - 06:30 PM",
+      bestTime: "October to March",
+      nearbyAttractions: ["Se Cathedral", "Archaeological Museum"],
+      visitDuration: "1 hour",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Basilica_of_Bom_Jesus.jpg/800px-Basilica_of_Bom_Jesus.jpg"
+    },
+    {
+      id: "goa-2",
+      name: "Dudhsagar Waterfalls",
+      lat: 15.3179,
+      lng: 74.3149,
+      category: "Adventure",
+      description: "A majestic four-tiered waterfall on the Mandovi River, looking like a cascading sea of milk amidst deep jungle trails.",
+      openingHours: "09:00 AM - 05:00 PM",
+      bestTime: "Post-monsoon (October to December)",
+      nearbyAttractions: ["Bhagwan Mahavir Sanctuary"],
+      visitDuration: "4 hours",
+      difficulty: "Challenging",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Dudhsagar_falls_Entry_gate_Goa.jpg"
+    },
+    {
+      id: "goa-3",
+      name: "Fontainhas Latin Quarter",
+      lat: 15.4989,
+      lng: 73.6429,
+      category: "Hidden Gems",
+      description: "An old Latin quarter in Panaji, featuring brightly colored Portuguese-style houses, cozy bakeries, and narrow streets.",
+      openingHours: "Open 24 Hours",
+      bestTime: "Late morning or early evening",
+      nearbyAttractions: ["Panaji Church", "Mandovi River Cruise"],
+      visitDuration: "1.5 hours",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/d/db/Road_along_Vasco-da-gama_residence_in_Fontainhas%2C_Panaji.jpg"
+    },
+    {
+      id: "goa-4",
+      name: "Anjuna Flea Market",
+      lat: 15.5794,
+      lng: 73.7432,
+      category: "Culture",
+      description: "A vibrant weekly beachfront market offering local spices, hippie handicrafts, live musical bands, and local beach snacks.",
+      openingHours: "09:00 AM - 06:00 PM (Wednesdays only)",
+      bestTime: "Wednesday afternoon",
+      nearbyAttractions: ["Anjuna Beach"],
+      visitDuration: "2 hours",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/d/db/Anjuna_beach_Goa.jpg"
+    },
+    {
+      id: "goa-5",
+      name: "Mangeshi Temple",
+      lat: 15.4439,
+      lng: 73.9687,
+      category: "Temples",
+      description: "A prominent 450-year-old temple dedicated to Lord Shiva, featuring a beautiful deepastambha (seven-story lamp tower).",
+      openingHours: "06:00 AM - 08:00 PM",
+      bestTime: "Early morning",
+      nearbyAttractions: ["Shantadurga Temple"],
+      visitDuration: "1 hour",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Mangeshi_temple.jpg/800px-Mangeshi_temple.jpg"
+    },
+    {
+      id: "goa-6",
+      name: "Fisherman's Wharf",
+      lat: 15.2678,
+      lng: 73.9429,
+      category: "Food",
+      description: "A celebrated riverside culinary spot serving traditional Goan fish curry, recheado masala, and fresh river catches.",
+      openingHours: "12:00 PM - 11:00 PM",
+      bestTime: "Lunch or Dinner hours",
+      nearbyAttractions: ["Cavelossim Beach"],
+      visitDuration: "1.5 hours",
+      difficulty: "Easy",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/b/bb/Goan_typical_meal_--_fish%2C_curry_and_rice.jpg"
     }
   ]
 };
@@ -168,7 +368,7 @@ export const LOCAL_STAYS_BY_CITY: Record<string, LocalStay[]> = {
       location: "Vikasnagar, Dehradun Outskirts",
       price: "₹4,500 / night",
       rating: 4.8,
-      photos: ["https://images.unsplash.com/photo-1563889362-57c2a5d1644d?auto=format&fit=crop&w=500&q=80"],
+      photos: ["https://upload.wikimedia.org/wikipedia/commons/e/e0/Tea_garden_at_Nagri_in_the_Kangra_Valley_of_Himachal_Pradesh%2C_India.jpg"],
       cultureExperience: ["Tea Leaf Plucking", "Artisan Woodcarving Workshop", "Local Village Walk"],
       hostName: "Ranjit & Devika Singh",
       description: "Stay in a restored 1920s colonial planter bungalow. Wake up to the aroma of fresh tea leaves and misty morning walks."
@@ -186,6 +386,58 @@ export const LOCAL_STAYS_BY_CITY: Record<string, LocalStay[]> = {
       cultureExperience: ["Block Printing Tutorial", "Rajasthani Puppetry Show", "Traditional Dal-Baati Dinner"],
       hostName: "Thakur Mahendra Singh",
       description: "A beautifully preserved 17th-century Haveli within the walls of the Pink City, run by direct descendants of royal court officers."
+    }
+  ],
+  "varanasi": [
+    {
+      id: "stay-var-1",
+      name: "Ganga View Heritage Kothi",
+      type: "Homestay",
+      location: "Dashashwamedh Ghat, Old Varanasi",
+      price: "₹3,800 / night",
+      rating: 4.9,
+      photos: ["https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=500&q=80"],
+      cultureExperience: ["Morning Raga Concert", "Ghat Walk with Local Guide", "Aarti Boat Tour"],
+      hostName: "Pandit Shivnath Shastri",
+      description: "A grand 150-year-old riverfront villa facing the Ganges river ghats, offering private balconies to view sunrise rituals."
+    },
+    {
+      id: "stay-var-2",
+      name: "Kashi Clay Pottery Homestay",
+      type: "Village Stay",
+      location: "Sarnath Craft Village, Varanasi",
+      price: "₹2,100 / night",
+      rating: 4.7,
+      photos: ["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=500&q=80"],
+      cultureExperience: ["Clay Pot Throwing", "Banarasi Silk Weaving Visit", "Sattvik Dinner"],
+      hostName: "Sohan & Reema Prajapati",
+      description: "Stay with local clay artisans. Learn traditional pot throwing and enjoy authentic home-cooked Banarasi meals."
+    }
+  ],
+  "goa": [
+    {
+      id: "stay-goa-1",
+      name: "Casa de Saffron Portuguese Villa",
+      type: "Farm Stay",
+      location: "Aldona Village, North Goa",
+      price: "₹4,200 / night",
+      rating: 4.8,
+      photos: ["https://upload.wikimedia.org/wikipedia/commons/f/f3/Spice_Plantation_in_Goa.JPG"],
+      cultureExperience: ["Feni Distilling Tutorial", "Spices Plantation Tour", "Baking Goan Bebinca"],
+      hostName: "Maria & Senor D'Souza",
+      description: "An authentic 1850 Portuguese estate surrounded by mango trees and pepper vines, offering deep glimpses into old Konkan life."
+    },
+    {
+      id: "stay-goa-2",
+      name: "Konkan Palms Beach Shack Retreat",
+      type: "Village Stay",
+      location: "Patnem Beach, South Goa",
+      price: "₹3,000 / night",
+      rating: 4.6,
+      photos: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80"],
+      cultureExperience: ["Traditional Fishing Net Cast", "Coconut Husk Crafting", "Konkan Seafood BBQ"],
+      hostName: "Joao Fernandes",
+      description: "Charming eco-cottages tucked under coconut groves along South Goa's quiet sandy beaches, run by a traditional local fisherman family."
     }
   ]
 };

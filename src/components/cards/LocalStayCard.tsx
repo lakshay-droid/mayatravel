@@ -41,6 +41,7 @@ export const LocalStayCard = React.memo(({ stay }: LocalStayCardProps) => {
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
           loading="lazy"
           fetchPriority="low"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
         <div className="absolute top-4 left-4">
           <span className="text-[10px] font-bold text-white bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full uppercase tracking-wider">

@@ -11,7 +11,7 @@ const HERO_IMAGES = [
     tagline: 'Pink City · Rajput Heritage',
   },
   {
-    url: 'https://images.unsplash.com/photo-1561361513-2d000a50f0db?auto=format&fit=crop&w=1400&q=80',
+    url: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Varanasi_Munshi_Ghat3.jpg',
     city: 'Varanasi',
     tagline: 'Sacred Ghats · Ancient Rituals',
   },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Save, CheckCircle, LogOut, Shield, Settings } from 'lucide-react';
+import { Save, CheckCircle, LogOut, Shield, Settings } from 'lucide-react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/ui/Button';
@@ -128,21 +128,37 @@ export const Profile: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-in-up" style={{ animationDelay: '0.1s' }}>
         {/* Left column: User Identity Card */}
         <div className="lg:col-span-1 flex flex-col gap-6">
-          <div className="glass-card p-6 flex flex-col items-center text-center gap-5 relative overflow-hidden">
+          <div className="glass-card flex flex-col items-center text-center gap-5 relative overflow-hidden p-0">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary to-primary-light" />
-            
-            {/* Avatar */}
-            <div className="w-20 h-20 rounded-full bg-surface border-4 border-border shadow-md flex items-center justify-center text-text-muted select-none">
-              <User size={36} aria-hidden="true" />
+
+            {/* Scenic Travel Banner */}
+            <div className="relative w-full h-32 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=600&q=80"
+                alt="Travel banner"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
             </div>
 
-            <div className="flex flex-col select-none">
+            {/* Avatar — overlaps banner */}
+            <div className="relative -mt-12 z-10">
+              <img
+                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(userNameDisplay)}&background=6c63ff&color=fff&size=80&bold=true&rounded=true`}
+                alt={`${userNameDisplay} avatar`}
+                className="w-20 h-20 rounded-full border-4 border-white shadow-lg"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="flex flex-col select-none px-6">
               <h3 className="font-extrabold text-lg text-text-primary tracking-tight">{userNameDisplay}</h3>
               <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider mt-0.5">Verified Local Explorer</span>
             </div>
 
             {/* RLS Rationale badges */}
-            <div className="flex flex-col gap-2 bg-background border border-border p-4 rounded-2xl w-full text-left select-none">
+            <div className="flex flex-col gap-2 bg-background border border-border p-4 rounded-2xl w-full text-left select-none mx-6" style={{ width: 'calc(100% - 3rem)' }}>
               <span className="text-[9px] font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
                 <Shield size={10} className="text-primary" aria-hidden="true" /> RLS Protection Active
               </span>
@@ -151,14 +167,16 @@ export const Profile: React.FC = () => {
               </p>
             </div>
 
-            <Button
-              onClick={handleLogoutClick}
-              variant="danger"
-              size="sm"
-              className="w-full flex items-center justify-center gap-1.5 mt-2 shadow-sm font-bold"
-            >
-              <LogOut size={14} aria-hidden="true" /> Log Out Account
-            </Button>
+            <div className="px-6 pb-6 w-full">
+              <Button
+                onClick={handleLogoutClick}
+                variant="danger"
+                size="sm"
+                className="w-full flex items-center justify-center gap-1.5 shadow-sm font-bold"
+              >
+                <LogOut size={14} aria-hidden="true" /> Log Out Account
+              </Button>
+            </div>
           </div>
         </div>
 

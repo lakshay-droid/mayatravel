@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import { ChevronDown, Sparkles } from 'lucide-react';
 
 const CITY_IMAGES: Record<string, string> = {
-  Dehradun: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
-  Jaipur: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80',
-  Varanasi: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80',
-  Goa: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+  Dehradun: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Dehradun-Uttarakhand.jpg',
+  Jaipur: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Hawa_Mahal%2C_Jaipur.jpg/960px-Hawa_Mahal%2C_Jaipur.jpg',
+  Varanasi: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Aarti%2C_Ganga_Aarti_at_Dashashwamedh_Ghat%2C_Varanasi.jpg/960px-Aarti%2C_Ganga_Aarti_at_Dashashwamedh_Ghat%2C_Varanasi.jpg',
+  Goa: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Calangute-Busy-Beach.jpg',
 };
 
 const CITY_TAGLINES: Record<string, string> = {

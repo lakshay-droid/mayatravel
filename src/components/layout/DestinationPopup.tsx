@@ -10,8 +10,8 @@ interface DestinationPopupProps {
 
 const CITY_OPTIONS = [
   { id: 'Dehradun', label: 'Dehradun', desc: 'Misty valley of Doon, Pahadi culture, caves', image: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=400&q=80' },
-  { id: 'Jaipur', label: 'Jaipur', desc: 'Royal Pink City, Rajput palaces, stepwells', image: 'https://images.unsplash.com/photo-1477584308802-e9c378852d92?auto=format&fit=crop&w=400&q=80' },
-  { id: 'Varanasi', label: 'Varanasi', desc: 'Oldest spiritual city, Ganga Ghats, narrow alleys', image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=400&q=80' },
+  { id: 'Jaipur', label: 'Jaipur', desc: 'Royal Pink City, Rajput palaces, stepwells', image: 'https://upload.wikimedia.org/wikipedia/commons/4/41/East_facade_Hawa_Mahal_Jaipur_from_ground_level_%28July_2022%29_-_img_01.jpg' },
+  { id: 'Varanasi', label: 'Varanasi', desc: 'Oldest spiritual city, Ganga Ghats, narrow alleys', image: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Varanasi_Munshi_Ghat3.jpg' },
   { id: 'Goa', label: 'Goa', desc: 'Portuguese heritage churches, beaches, spices', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' }
 ];
 

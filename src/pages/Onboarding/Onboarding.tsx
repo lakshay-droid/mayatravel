@@ -56,7 +56,7 @@ const CITIES = [
     label: 'Varanasi',
     state: 'Uttar Pradesh',
     desc: 'Sacred Ghats & Ancient Lore',
-    image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=600&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Varanasi_Munshi_Ghat3.jpg',
   },
   {
     id: 'Goa',
