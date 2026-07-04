@@ -2,6 +2,10 @@ import React from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
+/**
+ * ThemeToggle component renders a togglable button to switch the application theme
+ * between light and dark modes. Extends accessibility attributes.
+ */
 export const ThemeToggle: React.FC = () => {
   const { theme, toggle } = useTheme();
   const isDark = theme === 'dark';
@@ -30,9 +34,9 @@ export const ThemeToggle: React.FC = () => {
         />
       </div>
       {isDark ? (
-        <Moon size={13} className="text-primary" />
+        <Moon size={13} className="text-primary" aria-hidden="true" />
       ) : (
-        <Sun size={13} className="text-amber-500" />
+        <Sun size={13} className="text-amber-500" aria-hidden="true" />
       )}
       <span className="hidden sm:inline">{isDark ? 'Dark' : 'Light'}</span>
     </button>
