@@ -281,11 +281,6 @@ export const Login: React.FC = () => {
             </button>
           </div>
 
-          {!isSignUp && (
-            <p className="text-center text-[10px] text-text-muted mt-4">
-              Demo defaults: <span className="text-text-secondary font-semibold">admin / admin123</span> (Prefilled!)
-            </p>
-          )}
         </div>
       </motion.div>
     </div>
