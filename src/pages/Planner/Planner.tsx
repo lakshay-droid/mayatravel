@@ -308,7 +308,6 @@ export const Planner: React.FC = () => {
                           <span className="text-[10px] font-bold text-text-muted w-12 text-right shrink-0">{act.time}</span>
                         </div>
                         <div className="flex flex-col flex-1 min-w-0">
-                          <div className="w-px bg-white/10 self-center h-full absolute" />
                           <div className="glass-card p-3 relative">
                             <div className="flex items-center justify-between mb-0.5">
                               <span className="font-bold text-sm text-text-primary">{act.name || act.activityName}</span>
