@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Map, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
@@ -16,6 +16,10 @@ import { CityHero } from '../../components/explore/CityHero';
 const CATEGORIES = ['All', 'Temples', 'Culture', 'Museums', 'Hidden Gems', 'Food', 'Adventure'];
 const AVAILABLE_CITIES = ['Dehradun', 'Jaipur', 'Varanasi', 'Goa'];
 
+/**
+ * Home component renders the main explore feed where users can browse attractions, homestays,
+ * toggles a map, view companion feed tips, and trigger AI storyteller.
+ */
 export const Home: React.FC = () => {
   const { user } = useAuth();
 
@@ -44,7 +48,7 @@ export const Home: React.FC = () => {
     return LOCAL_STAYS_BY_CITY[cityKey] || [];
   }, [cityKey]);
 
-  const handleCityChange = async (cityName: string) => {
+  const handleCityChange = useCallback(async (cityName: string) => {
     setCity(cityName);
     setSelectedAttraction(null);
     setActiveCategory('All');
@@ -55,13 +59,13 @@ export const Home: React.FC = () => {
         await supabase.from('saved_destinations').insert({ user_id: user.id, city: cityName });
       } catch { /* best effort */ }
     }
-  };
+  }, [user]);
 
-  const handleStory = (name: string) => {
+  const handleStory = useCallback((name: string) => {
     setSelectedAttraction(null);
     setStoryTarget(name);
     setIsStoryOpen(true);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col gap-5 w-full pb-24">
@@ -114,7 +118,7 @@ export const Home: React.FC = () => {
       <section>
         <div className="glass-card p-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-            <Sparkles size={18} className="text-primary" />
+            <Sparkles size={18} className="text-primary" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-0.5">AI Companion</p>
@@ -132,7 +136,7 @@ export const Home: React.FC = () => {
               <p className="text-text-muted text-xs">Villages, orchards & tea estates</p>
             </div>
             <button className="flex items-center gap-1 text-primary text-xs font-semibold">
-              See all <ChevronRight size={14} />
+              See all <ChevronRight size={14} aria-hidden="true" />
             </button>
           </div>
 
@@ -156,14 +160,14 @@ export const Home: React.FC = () => {
           className="glass-card w-full flex items-center justify-between px-4 py-3 hover:border-white/15 transition-colors"
         >
           <div className="flex items-center gap-2.5">
-            <Map size={18} className="text-primary" />
+            <Map size={18} className="text-primary" aria-hidden="true" />
             <span className="font-bold text-text-primary text-sm">Explore on Map</span>
           </div>
           <motion.div
             animate={{ rotate: showMap ? 180 : 0 }}
             transition={{ duration: 0.3 }}
           >
-            <ChevronRight size={16} className="text-text-muted rotate-90" />
+            <ChevronRight size={16} className="text-text-muted rotate-90" aria-hidden="true" />
           </motion.div>
         </button>
 

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { createClient } from '@supabase/supabase-js';
 
-
 // Environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -9,10 +8,37 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 // Mock Database State for fallback mode
 const MOCK_STORAGE_KEY = 'locallens_mock_db';
 
-const getMockDB = () => {
+interface DemoUser {
+  id: string;
+  username: string;
+  password?: string;
+  email?: string;
+  created_at: string;
+}
+
+interface MockRow {
+  id: string;
+  user_id: string;
+  created_at?: string;
+  updated_at?: string;
+  [key: string]: unknown;
+}
+
+interface MockDB {
+  demo_users: DemoUser[];
+  travel_preferences: MockRow[];
+  saved_destinations: MockRow[];
+  trip_plans: MockRow[];
+  stories: MockRow[];
+  favorites: MockRow[];
+  search_history: MockRow[];
+  [table: string]: MockRow[] | DemoUser[];
+}
+
+const getMockDB = (): MockDB => {
   const data = localStorage.getItem(MOCK_STORAGE_KEY);
   if (!data) {
-    const initialDb = {
+    const initialDb: MockDB = {
       demo_users: [
         { id: 'usr-admin-123', username: 'admin', password: 'admin123', created_at: new Date().toISOString() }
       ],
@@ -26,17 +52,22 @@ const getMockDB = () => {
     localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(initialDb));
     return initialDb;
   }
-  return JSON.parse(data);
+  return JSON.parse(data) as MockDB;
 };
 
-const saveMockDB = (db: any) => {
+const saveMockDB = (db: MockDB): void => {
   localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(db));
 };
+
+interface Filter {
+  column: string;
+  value: unknown;
+}
 
 // Chainable query builder for Mock Client
 class MockQueryBuilder {
   private table: string;
-  private filters: { column: string; value: any }[] = [];
+  private filters: Filter[] = [];
   private client: MockSupabaseClient;
 
   constructor(table: string, client: MockSupabaseClient) {
@@ -44,17 +75,17 @@ class MockQueryBuilder {
     this.client = client;
   }
 
-  select(_columns = '*') {
+  select(_columns = '*'): this {
     // Return builder to support chaining
     return this;
   }
 
-  eq(column: string, value: any) {
+  eq(column: string, value: unknown): this {
     this.filters.push({ column, value });
     return this;
   }
 
-  insert(values: any | any[]) {
+  insert(values: Record<string, unknown> | Record<string, unknown>[]) {
     const builder = this;
     return {
       async select() {
@@ -62,61 +93,64 @@ class MockQueryBuilder {
         if (!db[builder.table]) db[builder.table] = [];
         
         const toInsert = Array.isArray(values) ? values : [values];
-        const inserted = toInsert.map((item: any) => ({
-          id: item.id || `row-${Math.random().toString(36).substr(2, 9)}`,
+        const inserted = toInsert.map((item) => ({
+          id: (item.id as string) || `row-${Math.random().toString(36).substring(2, 11)}`,
           user_id: builder.client.getCurrentUserId() || 'usr-admin-123',
           created_at: new Date().toISOString(),
           ...item
         }));
 
-        db[builder.table].push(...inserted);
+        const tableList = db[builder.table] as MockRow[];
+        tableList.push(...inserted);
         saveMockDB(db);
         return { data: inserted, error: null };
       },
-      async then(resolve: any) {
+      async then(resolve: (result: { data: MockRow[]; error: Error | null }) => void) {
         const db = getMockDB();
         if (!db[builder.table]) db[builder.table] = [];
         const toInsert = Array.isArray(values) ? values : [values];
-        const inserted = toInsert.map((item: any) => ({
-          id: item.id || `row-${Math.random().toString(36).substr(2, 9)}`,
+        const inserted = toInsert.map((item) => ({
+          id: (item.id as string) || `row-${Math.random().toString(36).substring(2, 11)}`,
           user_id: builder.client.getCurrentUserId() || 'usr-admin-123',
           created_at: new Date().toISOString(),
           ...item
         }));
-        db[builder.table].push(...inserted);
+        const tableList = db[builder.table] as MockRow[];
+        tableList.push(...inserted);
         saveMockDB(db);
         resolve({ data: inserted, error: null });
       }
     };
   }
 
-  upsert(values: any) {
+  upsert(values: Record<string, unknown> | Record<string, unknown>[]) {
     const builder = this;
     return {
       async select() {
         const db = getMockDB();
         if (!db[builder.table]) db[builder.table] = [];
         const toUpsert = Array.isArray(values) ? values : [values];
-        const results: any[] = [];
+        const results: MockRow[] = [];
         
-        toUpsert.forEach((item: any) => {
+        toUpsert.forEach((item) => {
           const userId = builder.client.getCurrentUserId() || 'usr-admin-123';
-          const index = db[builder.table].findIndex((r: any) => 
+          const tableList = db[builder.table] as MockRow[];
+          const index = tableList.findIndex((r) => 
             (r.user_id === userId && r.id === item.id) || 
             (builder.table === 'travel_preferences' && r.user_id === userId)
           );
           
-          const updatedItem = {
-            id: item.id || (index >= 0 ? db[builder.table][index].id : `row-${Math.random().toString(36).substr(2, 9)}`),
+          const updatedItem: MockRow = {
+            id: (item.id as string) || (index >= 0 ? tableList[index].id : `row-${Math.random().toString(36).substring(2, 11)}`),
             user_id: userId,
             updated_at: new Date().toISOString(),
             ...item
           };
           
           if (index >= 0) {
-            db[builder.table][index] = updatedItem;
+            tableList[index] = updatedItem;
           } else {
-            db[builder.table].push(updatedItem);
+            tableList.push(updatedItem);
           }
           results.push(updatedItem);
         });
@@ -124,26 +158,28 @@ class MockQueryBuilder {
         saveMockDB(db);
         return { data: results, error: null };
       },
-      async then(resolve: any) {
+      async then(resolve: (result: { data: null; error: Error | null }) => void) {
         const db = getMockDB();
         if (!db[builder.table]) db[builder.table] = [];
         const toUpsert = Array.isArray(values) ? values : [values];
-        toUpsert.forEach((item: any) => {
+        const tableList = db[builder.table] as MockRow[];
+        
+        toUpsert.forEach((item) => {
           const userId = builder.client.getCurrentUserId() || 'usr-admin-123';
-          const index = db[builder.table].findIndex((r: any) => 
+          const index = tableList.findIndex((r) => 
             (r.user_id === userId && r.id === item.id) || 
             (builder.table === 'travel_preferences' && r.user_id === userId)
           );
-          const updatedItem = {
-            id: item.id || (index >= 0 ? db[builder.table][index].id : `row-${Math.random().toString(36).substr(2, 9)}`),
+          const updatedItem: MockRow = {
+            id: (item.id as string) || (index >= 0 ? tableList[index].id : `row-${Math.random().toString(36).substring(2, 11)}`),
             user_id: userId,
             updated_at: new Date().toISOString(),
             ...item
           };
           if (index >= 0) {
-            db[builder.table][index] = updatedItem;
+            tableList[index] = updatedItem;
           } else {
-            db[builder.table].push(updatedItem);
+            tableList.push(updatedItem);
           }
         });
         saveMockDB(db);
@@ -155,12 +191,13 @@ class MockQueryBuilder {
   delete() {
     const builder = this;
     return {
-      eq(column: string, value: any) {
+      eq(column: string, value: unknown) {
         return {
-          async then(resolve: any) {
+          async then(resolve: (result: { error: Error | null }) => void) {
             const db = getMockDB();
             if (db[builder.table]) {
-              db[builder.table] = db[builder.table].filter((r: any) => r[column] !== value);
+              const tableList = db[builder.table] as MockRow[];
+              db[builder.table] = tableList.filter((r) => r[column] !== value);
               saveMockDB(db);
             }
             resolve({ error: null });
@@ -170,13 +207,13 @@ class MockQueryBuilder {
     };
   }
 
-  async single() {
+  async single(): Promise<{ data: MockRow | null; error: Error | null }> {
     const db = getMockDB();
-    let rows = db[this.table] || [];
+    let rows = (db[this.table] || []) as MockRow[];
 
     // Apply filters
     this.filters.forEach(f => {
-      rows = rows.filter((r: any) => r[f.column] === f.value);
+      rows = rows.filter((r) => r[f.column] === f.value);
     });
 
     if (rows.length > 0) {
@@ -185,18 +222,18 @@ class MockQueryBuilder {
     return { data: null, error: new Error('Row not found') };
   }
 
-  async then(resolve: any) {
+  async then(resolve: (result: { data: MockRow[] | DemoUser[]; error: Error | null }) => void): Promise<void> {
     const db = getMockDB();
-    let rows = db[this.table] || [];
+    let rows = (db[this.table] || []) as MockRow[];
 
     // Apply simple RLS simulation
     if (this.client.getCurrentUserId() && this.table !== 'demo_users') {
-      rows = rows.filter((r: any) => r.user_id === this.client.getCurrentUserId() || r.user_id === undefined);
+      rows = rows.filter((r) => r.user_id === this.client.getCurrentUserId() || r.user_id === undefined);
     }
 
     // Apply filters
     this.filters.forEach(f => {
-      rows = rows.filter((r: any) => r[f.column] === f.value);
+      rows = rows.filter((r) => r[f.column] === f.value);
     });
 
     resolve({ data: rows, error: null });
@@ -211,48 +248,50 @@ class MockSupabaseClient {
     this.syncSession();
   }
 
-  syncSession() {
+  syncSession(): void {
     const session = sessionStorage.getItem('locallens_session');
     if (session) {
-      this.currentUserId = JSON.parse(session).user?.id || null;
+      const parsedSession = JSON.parse(session) as { user?: { id: string } };
+      this.currentUserId = parsedSession.user?.id || null;
     } else {
       const user = sessionStorage.getItem('locallens_user');
       if (user) {
-        this.currentUserId = JSON.parse(user).id || null;
+        const parsedUser = JSON.parse(user) as { id: string };
+        this.currentUserId = parsedUser.id || null;
       } else {
         this.currentUserId = null;
       }
     }
   }
 
-  getCurrentUserId() {
+  getCurrentUserId(): string | null {
     this.syncSession();
     return this.currentUserId;
   }
 
   auth = {
-    getUser: async () => {
+    getUser: async (): Promise<{ data: { user: { id: string; email: string; user_metadata: { username: string } } | null }; error: Error | null }> => {
       this.syncSession();
       if (this.currentUserId) {
         const db = getMockDB();
-        const user = db.demo_users.find((u: any) => u.id === this.currentUserId);
+        const user = db.demo_users.find((u) => u.id === this.currentUserId);
         if (user) {
           return { data: { user: { id: user.id, email: `${user.username}@locallens.ai`, user_metadata: { username: user.username } } }, error: null };
         }
       }
       return { data: { user: null }, error: new Error('No active session') };
     },
-    getSession: async () => {
+    getSession: async (): Promise<{ data: { session: unknown }; error: null }> => {
       const session = sessionStorage.getItem('locallens_session');
       if (session) {
         return { data: { session: JSON.parse(session) }, error: null };
       }
       return { data: { session: null }, error: null };
     },
-    signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
+    signInWithPassword: async ({ email, password }: { email: string; password: string }): Promise<{ data: { user: { id: string; email: string; user_metadata: { username: string } } | null; session: unknown }; error: Error | null }> => {
       const db = getMockDB();
       const username = email.split('@')[0];
-      const user = db.demo_users.find((u: any) => u.username === username && u.password === password);
+      const user = db.demo_users.find((u) => u.username === username && u.password === password);
       
       if (user) {
         const session = {
@@ -266,7 +305,7 @@ class MockSupabaseClient {
       }
       return { data: { user: null, session: null }, error: new Error('Invalid credentials') };
     },
-    signOut: async () => {
+    signOut: async (): Promise<{ error: null }> => {
       sessionStorage.removeItem('locallens_session');
       sessionStorage.removeItem('locallens_user');
       this.currentUserId = null;
@@ -274,7 +313,7 @@ class MockSupabaseClient {
     }
   };
 
-  from(table: string) {
+  from(table: string): MockQueryBuilder {
     return new MockQueryBuilder(table, this);
   }
 }
@@ -282,5 +321,5 @@ class MockSupabaseClient {
 // Export the active client
 export const isMockMode = !supabaseUrl || !supabaseAnonKey;
 export const supabase = isMockMode 
-  ? (new MockSupabaseClient() as any) 
+  ? (new MockSupabaseClient() as unknown as ReturnType<typeof createClient>) 
   : createClient(supabaseUrl, supabaseAnonKey);

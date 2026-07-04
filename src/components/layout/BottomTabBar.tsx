@@ -8,6 +8,9 @@ const tabs = [
   { path: '/profile', label: 'Profile', icon: User },
 ];
 
+/**
+ * BottomTabBar component provides sticky bottom tabbed navigation for small screens.
+ */
 export const BottomTabBar: React.FC = () => {
   return (
     <nav
@@ -37,6 +40,7 @@ export const BottomTabBar: React.FC = () => {
                     size={22}
                     strokeWidth={isActive ? 2.2 : 1.8}
                     className="transition-all duration-300"
+                    aria-hidden="true"
                   />
                   {isActive && (
                     <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />

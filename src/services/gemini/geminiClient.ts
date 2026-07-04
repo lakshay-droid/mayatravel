@@ -9,6 +9,7 @@ import {
   FALLBACK_COMPANION
 } from './prompts';
 import type { StoryContent, ItineraryDay, DestinationRecommendation, CompanionInsights } from '../../types';
+import { sanitizeString } from '../security';
 
 const MOCK_DELAY = 1000;
 
@@ -25,8 +26,25 @@ const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-// Secure API caller that handles Netlify functions or direct fallback
-async function callGeminiAPI(prompt: string): Promise<any> {
+interface GeminiCandidate {
+  content?: {
+    parts?: Array<{
+      text?: string;
+    }>;
+  };
+}
+
+interface GeminiResponse {
+  candidates?: GeminiCandidate[];
+}
+
+/**
+ * Secure API caller that handles Netlify functions or direct fallback.
+ * 
+ * @param prompt Prompt to send to Gemini API
+ * @returns Parsed JSON response from Gemini
+ */
+async function callGeminiAPI(prompt: string): Promise<unknown> {
   if (import.meta.env.MODE === 'test') {
     throw new Error('Test environment: bypassing api call');
   }
@@ -57,7 +75,7 @@ async function callGeminiAPI(prompt: string): Promise<any> {
     });
 
     if (response.ok) {
-      const data = await response.json();
+      const data = await response.json() as GeminiResponse;
       return parseGeminiResponse(data);
     }
   } catch (e) {
@@ -76,7 +94,7 @@ async function callGeminiAPI(prompt: string): Promise<any> {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as GeminiResponse;
         return parseGeminiResponse(data);
       }
     } catch (e) {
@@ -88,14 +106,20 @@ async function callGeminiAPI(prompt: string): Promise<any> {
   throw new Error('All API channels exhausted. Falling back to local dataset.');
 }
 
-// Parses Google Gemini response content
-function parseGeminiResponse(data: any): any {
+/**
+ * Parses Google Gemini response content safely and sanitizes the output string.
+ * 
+ * @param data Response payload from Gemini
+ * @returns Parsed and sanitized JSON object
+ */
+function parseGeminiResponse(data: GeminiResponse): unknown {
   try {
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) {
       throw new Error('Empty content returned from Gemini.');
     }
-    return JSON.parse(text);
+    const sanitizedText = sanitizeString(text);
+    return JSON.parse(sanitizedText);
   } catch (e) {
     console.error('Failed to parse Gemini response as JSON:', e, data);
     throw new Error('Invalid JSON format returned by AI.');

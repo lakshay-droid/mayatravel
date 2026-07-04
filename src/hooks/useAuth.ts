@@ -83,8 +83,9 @@ export const useAuth = () => {
       sessionStorage.setItem('locallens_user', JSON.stringify(authUser));
       setUser(authUser);
       return { success: true };
-    } catch (err: any) {
-      return { success: false, error: err?.message || 'Authentication failed.' };
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : 'Authentication failed.';
+      return { success: false, error: errMsg };
     }
   };
 

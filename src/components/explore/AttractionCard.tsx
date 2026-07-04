@@ -9,6 +9,13 @@ interface AttractionCardProps {
   index?: number;
 }
 
+/**
+ * AttractionCard component renders a button containing card information of a specific travel attraction.
+ * 
+ * @param attraction The attraction details object
+ * @param onTap Callback when the card is tapped/clicked
+ * @param index Optional list index for staggered animation delays
+ */
 export const AttractionCard: React.FC<AttractionCardProps> = ({ attraction, onTap, index = 0 }) => {
   const categoryColors: Record<string, string> = {
     Temples: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
@@ -38,6 +45,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({ attraction, onTa
           alt={attraction.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
+          fetchPriority="low"
         />
         <div className="absolute inset-0 photo-overlay" />
 
@@ -51,7 +59,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({ attraction, onTa
         {/* Story trigger hint */}
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="flex items-center gap-1 bg-primary/80 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-            <Sparkles size={10} />
+            <Sparkles size={10} aria-hidden="true" />
             Story
           </div>
         </div>
@@ -63,15 +71,15 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({ attraction, onTa
           </h3>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 text-white/70 text-xs">
-              <Clock size={11} />
+              <Clock size={11} aria-hidden="true" />
               {attraction.visitDuration}
             </span>
             <span className="flex items-center gap-1 text-white/70 text-xs">
-              <MapPin size={11} />
+              <MapPin size={11} aria-hidden="true" />
               {attraction.difficulty}
             </span>
             <span className="flex items-center gap-1 text-amber-400 text-xs ml-auto">
-              <Star size={11} fill="currentColor" />
+              <Star size={11} fill="currentColor" aria-hidden="true" />
               {(Math.random() * 0.8 + 4.0).toFixed(1)}
             </span>
           </div>

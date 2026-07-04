@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Sparkles, AlertCircle, Play, Pause, Volume2, RotateCcw } from 'lucide-react';
 import { generateStory } from '../../services/gemini/geminiClient';
@@ -12,6 +12,14 @@ interface StoryModalProps {
   attractionName: string;
 }
 
+/**
+ * StoryModal component displays AI-generated stories, folklore, history, and travel tips
+ * for a specific attraction.
+ * 
+ * @param isOpen Determines visibility
+ * @param onClose Callback when closing modal
+ * @param attractionName The spot name to generate story for
+ */
 export const StoryModal: React.FC<StoryModalProps> = ({
   isOpen,
   onClose,
@@ -50,7 +58,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
   // Handle simulated audio narration timer
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (isPlaying) {
       interval = setInterval(() => {
         setAudioProgress((prev) => {
@@ -62,17 +70,25 @@ export const StoryModal: React.FC<StoryModalProps> = ({
         });
       }, 300);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isPlaying]);
 
-  const togglePlayback = () => {
-    setIsPlaying(!isPlaying);
-  };
+  const togglePlayback = useCallback(() => {
+    setIsPlaying(prev => !prev);
+  }, []);
 
-  const handleResetAudio = () => {
+  const handleResetAudio = useCallback(() => {
     setIsPlaying(false);
     setAudioProgress(0);
-  };
+  }, []);
+
+  const tabs = [
+    { id: 'lore', label: 'Lore & Folklore' },
+    { id: 'details', label: 'History & Arch' },
+    { id: 'facts', label: 'Facts & Tips' }
+  ] as const;
 
   return (
     <Modal
@@ -86,7 +102,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
           <div className="relative w-16 h-16 flex items-center justify-center mb-4">
             {/* Spinning decorative elements */}
             <div className="absolute inset-0 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-            <BookOpen size={24} className="text-primary animate-pulse" />
+            <BookOpen size={24} className="text-primary animate-pulse" aria-hidden="true" />
           </div>
           <span className="text-sm font-semibold text-slate-800 animate-pulse">Consulting ancient scripts...</span>
           <span className="text-xs text-slate-400 mt-1">AI is composing legends & histories</span>
@@ -95,7 +111,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
 
       {error && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <AlertCircle size={40} className="text-rose-500 mb-3" />
+          <AlertCircle size={40} className="text-rose-500 mb-3" aria-hidden="true" />
           <h4 className="font-bold text-slate-800 mb-1">Spirit Connection Interrupted</h4>
           <p className="text-slate-400 text-xs max-w-sm mb-6 leading-relaxed">{error}</p>
           <Button variant="secondary" onClick={() => setLoading(true)} size="sm">
@@ -114,11 +130,11 @@ export const StoryModal: React.FC<StoryModalProps> = ({
                 className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors shadow-md shadow-primary/20 focus:outline-none"
                 aria-label={isPlaying ? 'Pause narration' : 'Play narration'}
               >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
+                {isPlaying ? <Pause size={16} aria-hidden="true" /> : <Play size={16} className="ml-0.5" aria-hidden="true" />}
               </button>
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  Listen to Local Legend <Volume2 size={12} className="text-primary" />
+                  Listen to Local Legend <Volume2 size={12} className="text-primary" aria-hidden="true" />
                 </span>
                 <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
                   {isPlaying ? 'Narrating story...' : 'AI Audio Companion'}
@@ -143,22 +159,18 @@ export const StoryModal: React.FC<StoryModalProps> = ({
               className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors focus:outline-none"
               title="Rewind"
             >
-              <RotateCcw size={14} />
+              <RotateCcw size={14} aria-hidden="true" />
             </button>
           </div>
 
           {/* Navigation Tabs */}
           <div className="flex border-b border-slate-100 pb-px gap-2">
-            {[
-              { id: 'lore', label: 'Lore & Folklore' },
-              { id: 'details', label: 'History & Arch' },
-              { id: 'facts', label: 'Facts & Tips' }
-            ].map((tab) => {
+            {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-300 focus:outline-none ${
                     isActive
                       ? 'border-primary text-primary-dark font-extrabold'
@@ -217,11 +229,11 @@ export const StoryModal: React.FC<StoryModalProps> = ({
               >
                 <div className="flex flex-col gap-3">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                    Interesting Facts <Sparkles size={12} className="text-primary" />
+                    Interesting Facts <Sparkles size={12} className="text-primary" aria-hidden="true" />
                   </h4>
                   <ul className="flex flex-col gap-2">
                     {story.interestingFacts.map((fact, idx) => (
-                      <li key={idx} className="flex gap-2 text-xs font-medium text-slate-600">
+                      <li key={fact} className="flex gap-2 text-xs font-medium text-slate-600">
                         <span className="text-primary font-bold">{idx + 1}.</span>
                         <span>{fact}</span>
                       </li>
@@ -234,8 +246,8 @@ export const StoryModal: React.FC<StoryModalProps> = ({
                     Local Companion Tips
                   </h4>
                   <ul className="flex flex-col gap-2">
-                    {story.travelTips.map((tip, idx) => (
-                      <li key={idx} className="flex gap-2 text-xs font-medium text-slate-600">
+                    {story.travelTips.map((tip) => (
+                      <li key={tip} className="flex gap-2 text-xs font-medium text-slate-600">
                         <span className="text-emerald-500 font-bold">✔</span>
                         <span>{tip}</span>
                       </li>

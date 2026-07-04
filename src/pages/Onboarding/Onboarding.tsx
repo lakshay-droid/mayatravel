@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Compass, Sparkles } from 'lucide-react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useAuth } from '../../hooks/useAuth';
+import type { TravelPreferences } from '../../types';
 
 // ─── Step 1 Data: Travel Personality ────────────────────────────────────────
 const PERSONALITIES = [
@@ -89,6 +90,10 @@ const GROUPS = [
 
 const TOTAL_STEPS = 3;
 
+/**
+ * Onboarding component renders step-by-step setup wizard for new users,
+ * collecting travel personality, city focus, budget, and group dynamics.
+ */
 export const Onboarding: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -101,49 +106,47 @@ export const Onboarding: React.FC = () => {
   const [group, setGroup] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const isValid = () => {
+  const isValid = useCallback(() => {
     if (step === 1) return !!personality;
     if (step === 2) return !!city;
     if (step === 3) return !!budget && !!group;
     return false;
-  };
+  }, [step, personality, city, budget, group]);
 
-
-
-  const goPrev = () => {
+  const goPrev = useCallback(() => {
     if (step > 1) { setDir(-1); setStep(step - 1); }
-  };
+  }, [step]);
 
   // Automatically advance to Step 2 upon selecting personality
-  const handleSelectPersonality = (pId: string) => {
+  const handleSelectPersonality = useCallback((pId: string) => {
     setPersonality(pId);
     setTimeout(() => {
       setDir(1);
       setStep(2);
     }, 300);
-  };
+  }, []);
 
   // Automatically advance to Step 3 upon selecting city
-  const handleSelectCity = (cId: string) => {
+  const handleSelectCity = useCallback((cId: string) => {
     setCity(cId);
     setTimeout(() => {
       setDir(1);
       setStep(3);
     }, 300);
-  };
+  }, []);
 
-  const handleFinish = async () => {
+  const handleFinish = useCallback(async () => {
     if (!user) return;
     setSubmitting(true);
     try {
       await supabase.from('travel_preferences').upsert({
         user_id: user.id,
-        personality: personality as any,
-        favorite_destination: city as any,
-        transport_pref: 'Car' as any,
-        travel_group: group as any,
-        food_pref: 'Local Cuisine' as any,
-        budget: budget as any,
+        personality: personality as TravelPreferences['personality'],
+        favorite_destination: 'Mountains', // default fallback scenic option for type safety
+        transport_pref: 'Car',
+        travel_group: group as TravelPreferences['travel_group'],
+        food_pref: 'Local Cuisine',
+        budget: budget as TravelPreferences['budget'],
       });
 
       // Store city choice and onboarding status in localStorage
@@ -159,7 +162,7 @@ export const Onboarding: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [user, personality, city, group, budget, navigate]);
 
   const slideVariants = {
     initial: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
@@ -177,10 +180,10 @@ export const Onboarding: React.FC = () => {
       <header className="relative z-10 flex items-center justify-between px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary to-primary-light flex items-center justify-center shadow-glow">
-            <Compass size={16} className="text-white" />
+            <Compass size={16} className="text-white" aria-hidden="true" />
           </div>
           <span className="font-black text-text-primary tracking-tight flex items-center gap-1">
-            LocalLens <Sparkles size={10} className="text-primary" />
+            LocalLens <Sparkles size={10} className="text-primary" aria-hidden="true" />
           </span>
         </div>
 
@@ -188,7 +191,7 @@ export const Onboarding: React.FC = () => {
         <div className="flex items-center gap-2">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
             <div
-              key={i}
+              key={i + 1}
               className={`rounded-full transition-all duration-500 ${
                 i + 1 === step
                   ? 'w-6 h-2 bg-primary'
@@ -235,11 +238,17 @@ export const Onboarding: React.FC = () => {
                         sel ? 'ring-2 ring-primary scale-[0.98]' : 'hover:scale-[0.99]'
                       }`}
                     >
-                      <img src={p.image} alt={p.label} className="absolute inset-0 w-full h-full object-cover" />
+                      <img
+                        src={p.image}
+                        alt={p.label}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="lazy"
+                        fetchPriority="low"
+                      />
                       <div className={`absolute inset-0 bg-gradient-to-t ${p.color}`} />
                       {sel && (
                         <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                          <Check size={13} className="text-white" />
+                          <Check size={13} className="text-white" aria-hidden="true" />
                         </div>
                       )}
                       <div className="relative z-10">
@@ -284,11 +293,17 @@ export const Onboarding: React.FC = () => {
                         sel ? 'ring-2 ring-primary scale-[0.98]' : 'hover:scale-[0.99]'
                       }`}
                     >
-                      <img src={c.image} alt={c.label} className="absolute inset-0 w-full h-full object-cover" />
+                      <img
+                        src={c.image}
+                        alt={c.label}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="lazy"
+                        fetchPriority="low"
+                      />
                       <div className="absolute inset-0 photo-overlay" />
                       {sel && (
                         <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                          <Check size={13} className="text-white" />
+                          <Check size={13} className="text-white" aria-hidden="true" />
                         </div>
                       )}
                       <div className="relative z-10">
@@ -393,7 +408,7 @@ export const Onboarding: React.FC = () => {
                 <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" className="opacity-75" />
               </svg>
             ) : null}
-            {submitting ? 'Saving...' : "Let's Go"} {!submitting && <Sparkles size={14} />}
+            {submitting ? 'Saving...' : "Let's Go"} {!submitting && <Sparkles size={14} aria-hidden="true" />}
           </button>
         )}
       </footer>

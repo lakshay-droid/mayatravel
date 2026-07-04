@@ -10,6 +10,15 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
+/**
+ * Modal component provides dialog overlay focus trap, Escape key closing, and custom widths.
+ * 
+ * @param isOpen Determines visibility
+ * @param onClose Callback to close the modal
+ * @param title Optional title text
+ * @param children Content to render inside body
+ * @param size Responsive width constraint
+ */
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -97,7 +106,7 @@ export const Modal: React.FC<ModalProps> = ({
                 className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
                 aria-label="Close dialog"
               >
-                <X size={18} />
+                <X size={18} aria-hidden="true" />
               </button>
             </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Compass, Sparkles, Eye, EyeOff, AlertCircle } from 'lucide-react';
@@ -27,6 +27,10 @@ const HERO_IMAGES = [
   },
 ];
 
+/**
+ * Login component renders user authentication options (signIn / signUp).
+ * It features a cycling fullscreen photography carousel (LCP) and pre-filled demo accounts.
+ */
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login, signup } = useAuth();
@@ -48,22 +52,20 @@ export const Login: React.FC = () => {
     return () => clearInterval(id);
   }, []);
 
-  const handleToggleMode = () => {
-    setIsSignUp(!isSignUp);
+  const handleToggleMode = useCallback(() => {
+    setIsSignUp(prev => !prev);
     setError(null);
-    if (!isSignUp) {
-      // Clear inputs for fresh signup
-      setUsername('');
-      setPassword('');
-      setEmail('');
-    } else {
-      // Restore demo credentials for convenience
+    if (isSignUp) {
       setUsername('admin');
       setPassword('admin123');
+    } else {
+      setUsername('');
+      setPassword('');
     }
-  };
+    setEmail('');
+  }, [isSignUp]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -100,13 +102,13 @@ export const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [email, username, password, isSignUp, login, signup, navigate]);
 
   const currentHero = HERO_IMAGES[heroIdx];
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background flex items-end md:items-center justify-center">
-      {/* Full-screen rotating hero background */}
+      {/* Full-screen rotating hero background - LCP: fetchpriority high */}
       <AnimatePresence mode="sync">
         <motion.div
           key={heroIdx}
@@ -120,6 +122,7 @@ export const Login: React.FC = () => {
             src={currentHero.url}
             alt={currentHero.city}
             className="w-full h-full object-cover"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/80" />
         </motion.div>
@@ -138,14 +141,14 @@ export const Login: React.FC = () => {
 
       {/* Hero indicator dots */}
       <div className="absolute top-10 right-6 z-10 flex flex-col gap-1.5">
-        {HERO_IMAGES.map((_, i) => (
+        {HERO_IMAGES.map((item, i) => (
           <button
-            key={i}
+            key={item.city}
             onClick={() => setHeroIdx(i)}
             className={`w-1 rounded-full transition-all duration-500 ${
               i === heroIdx ? 'h-6 bg-white' : 'h-2 bg-white/30'
             }`}
-            aria-label={`View ${HERO_IMAGES[i].city}`}
+            aria-label={`View ${item.city}`}
           />
         ))}
       </div>
@@ -161,12 +164,12 @@ export const Login: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center gap-2.5 mb-7">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-light flex items-center justify-center shadow-glow">
-              <Compass size={20} className="text-white" />
+              <Compass size={20} className="text-white" aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-1">
                 <span className="font-black text-lg text-text-primary tracking-tight">LocalLens</span>
-                <Sparkles size={12} className="text-primary" />
+                <Sparkles size={12} className="text-primary" aria-hidden="true" />
               </div>
               <p className="text-[10px] text-text-muted font-semibold uppercase tracking-widest">AI Travel Companion</p>
             </div>
@@ -187,7 +190,7 @@ export const Login: React.FC = () => {
               className="flex items-center gap-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3 mb-4"
               role="alert"
             >
-              <AlertCircle size={15} className="text-rose-400 shrink-0" />
+              <AlertCircle size={15} className="text-rose-400 shrink-0" aria-hidden="true" />
               <p className="text-rose-300 text-xs font-medium">{error}</p>
             </motion.div>
           )}
@@ -248,7 +251,7 @@ export const Login: React.FC = () => {
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                   aria-label={showPw ? 'Hide password' : 'Show password'}
                 >
-                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPw ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
                 </button>
               </div>
             </div>

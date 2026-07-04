@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Search, Sparkles } from 'lucide-react';
 import { supabase } from '../../services/supabase/supabaseClient';
@@ -15,6 +15,12 @@ const CITY_OPTIONS = [
   { id: 'Goa', label: 'Goa', desc: 'Portuguese heritage churches, beaches, spices', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' }
 ];
 
+/**
+ * DestinationPopup component renders a modal prompt on user's first login to select
+ * their active destination. Updates Supabase database backend.
+ * 
+ * @param onSelectCity Callback to trigger city switch on parent
+ */
 export const DestinationPopup: React.FC<DestinationPopupProps> = ({
   onSelectCity
 }) => {
@@ -49,7 +55,7 @@ export const DestinationPopup: React.FC<DestinationPopupProps> = ({
     checkActiveDestination();
   }, [user, onSelectCity]);
 
-  const handleSelect = async (cityName: string) => {
+  const handleSelect = useCallback(async (cityName: string) => {
     if (!user) return;
     setIsOpen(false);
     onSelectCity(cityName);
@@ -65,12 +71,14 @@ export const DestinationPopup: React.FC<DestinationPopupProps> = ({
     } catch (err) {
       console.error('Failed to save active destination to database', err);
     }
-  };
+  }, [user, onSelectCity]);
 
-  const filteredCities = CITY_OPTIONS.filter(city => 
-    city.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    city.desc.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCities = useMemo(() => {
+    return CITY_OPTIONS.filter(city => 
+      city.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      city.desc.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
 
   return (
     <AnimatePresence>
@@ -95,10 +103,10 @@ export const DestinationPopup: React.FC<DestinationPopupProps> = ({
             {/* Header */}
             <div className="text-center flex flex-col items-center gap-1.5 select-none">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                <MapPin size={20} />
+                <MapPin size={20} aria-hidden="true" />
               </div>
               <h3 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-1.5 justify-center">
-                Select Active Destination <Sparkles size={14} className="text-primary fill-primary" />
+                Select Active Destination <Sparkles size={14} className="text-primary fill-primary" aria-hidden="true" />
               </h3>
               <p className="text-slate-400 text-sm max-w-md">
                 Which city are you currently exploring today? Select one to customize your companion feed and interactive map.
@@ -107,8 +115,10 @@ export const DestinationPopup: React.FC<DestinationPopupProps> = ({
 
             {/* Search Input */}
             <div className="relative w-full">
-              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+              <label htmlFor="city-search" className="sr-only">Search city (e.g. Dehradun, Jaipur...)</label>
               <input
+                id="city-search"
                 type="text"
                 placeholder="Search city (e.g. Dehradun, Jaipur...)"
                 value={searchQuery}
@@ -129,6 +139,8 @@ export const DestinationPopup: React.FC<DestinationPopupProps> = ({
                     src={city.image}
                     alt={city.label}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-40"
+                    loading="lazy"
+                    fetchPriority="low"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/60 to-transparent" />
                   

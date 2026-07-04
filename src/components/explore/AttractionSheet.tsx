@@ -9,6 +9,13 @@ interface AttractionSheetProps {
   onStory: (name: string) => void;
 }
 
+/**
+ * AttractionSheet component renders a bottom sheet containing details about the active attraction.
+ * 
+ * @param attraction Selected attraction details (or null if closed)
+ * @param onClose Callback to close the bottom sheet
+ * @param onStory Callback to trigger storytelling mode
+ */
 export const AttractionSheet: React.FC<AttractionSheetProps> = ({ attraction, onClose, onStory }) => {
   // Close on escape key
   useEffect(() => {
@@ -69,6 +76,8 @@ export const AttractionSheet: React.FC<AttractionSheetProps> = ({ attraction, on
                 src={attraction.photo}
                 alt={attraction.name}
                 className="w-full h-full object-cover"
+                loading="lazy"
+                fetchPriority="low"
               />
               <div className="absolute inset-0 photo-overlay" />
               <button
@@ -76,7 +85,7 @@ export const AttractionSheet: React.FC<AttractionSheetProps> = ({ attraction, on
                 className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
                 aria-label="Close"
               >
-                <X size={16} />
+                <X size={16} aria-hidden="true" />
               </button>
               <div className="absolute bottom-4 left-4">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-white/60 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-sm">
@@ -100,7 +109,7 @@ export const AttractionSheet: React.FC<AttractionSheetProps> = ({ attraction, on
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="glass-card p-3">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <Icon size={12} className="text-primary" />
+                      <Icon size={12} className="text-primary" aria-hidden="true" />
                       <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">{label}</span>
                     </div>
                     <span className="text-sm font-semibold text-text-primary">{value}</span>
@@ -113,7 +122,7 @@ export const AttractionSheet: React.FC<AttractionSheetProps> = ({ attraction, on
                 onClick={() => onStory(attraction.name)}
                 className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
               >
-                <Sparkles size={16} />
+                <Sparkles size={16} aria-hidden="true" />
                 Tell me the Story
               </button>
             </div>

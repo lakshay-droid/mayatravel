@@ -22,12 +22,19 @@ interface CityHeroProps {
   onCityChange: (city: string) => void;
 }
 
+/**
+ * CityHero component displays a prominent banner for the currently selected city (LCP target).
+ * 
+ * @param city Active city
+ * @param availableCities List of cities available to select
+ * @param onCityChange Callback to select a new city
+ */
 export const CityHero: React.FC<CityHeroProps> = ({ city, availableCities, onCityChange }) => {
   const [open, setOpen] = React.useState(false);
 
   return (
     <div className="relative w-full h-52 rounded-2xl overflow-hidden">
-      {/* Background image with transition */}
+      {/* Background image with transition - LCP target: fetchpriority high, no lazy loading */}
       <motion.img
         key={city}
         src={CITY_IMAGES[city] || CITY_IMAGES.Jaipur}
@@ -36,6 +43,7 @@ export const CityHero: React.FC<CityHeroProps> = ({ city, availableCities, onCit
         initial={{ opacity: 0, scale: 1.05 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        fetchPriority="high"
       />
       <div className="absolute inset-0 photo-overlay" />
 
@@ -44,7 +52,7 @@ export const CityHero: React.FC<CityHeroProps> = ({ city, availableCities, onCit
         <div className="flex items-end justify-between">
           <div>
             <div className="flex items-center gap-1.5 mb-1">
-              <Sparkles size={12} className="text-primary-light" />
+              <Sparkles size={12} className="text-primary-light" aria-hidden="true" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Now Exploring</span>
             </div>
             <h1 className="text-3xl font-black text-white tracking-tight leading-none">{city}</h1>
@@ -59,7 +67,7 @@ export const CityHero: React.FC<CityHeroProps> = ({ city, availableCities, onCit
               aria-label="Change city"
               aria-expanded={open}
             >
-              Change <ChevronDown size={12} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+              Change <ChevronDown size={12} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
             </button>
 
             {open && (

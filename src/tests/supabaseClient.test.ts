@@ -20,7 +20,7 @@ describe('Supabase Client Hybrid Fallback', () => {
 
       expect(response.error).toBeNull();
       expect(response.data.user).toBeDefined();
-      expect(response.data.user.user_metadata.username).toBe('admin');
+      expect(response.data.user?.user_metadata?.username).toBe('admin');
       
       const session = sessionStorage.getItem('locallens_session');
       expect(session).not.toBeNull();
@@ -61,7 +61,8 @@ describe('Supabase Client Hybrid Fallback', () => {
         .insert(newPref);
 
       expect(insertRes.data).toBeDefined();
-      expect(insertRes.data[0].personality).toBe('Adventure');
+      const insertData = insertRes.data as unknown as Array<{ personality: string }>;
+      expect(insertData?.[0]?.personality).toBe('Adventure');
 
       // Select it back
       const selectRes = await supabase
@@ -69,8 +70,9 @@ describe('Supabase Client Hybrid Fallback', () => {
         .select('*');
 
       expect(selectRes.data).toBeDefined();
-      expect(selectRes.data.length).toBeGreaterThan(0);
-      expect(selectRes.data[0].food_pref).toBe('Vegan');
+      const selectData = selectRes.data as unknown as Array<{ food_pref: string }>;
+      expect(selectData?.length).toBeGreaterThan(0);
+      expect(selectData?.[0]?.food_pref).toBe('Vegan');
     }
   });
 });

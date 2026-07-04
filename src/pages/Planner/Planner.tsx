@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Calendar, Save, Trash2, RotateCcw, AlertTriangle, CheckCircle, MapPin, Send } from 'lucide-react';
 import { generateTripPlan } from '../../services/gemini/geminiClient';
@@ -14,6 +14,10 @@ const BUDGETS = [
 ];
 const INTERESTS = ['History', 'Nature', 'Foodie', 'Adventure', 'Culture', 'Photography', 'Spirituality', 'Shopping'];
 
+/**
+ * Planner component renders the trip planner interface where users can customize city, budget,
+ * duration, and interests to generate an AI-powered travel itinerary.
+ */
 export const Planner: React.FC = () => {
   const { user } = useAuth();
 
@@ -28,13 +32,13 @@ export const Planner: React.FC = () => {
   const [activeDayTab, setActiveDayTab] = useState(0);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
-  const toggleInterest = (id: string) => {
+  const toggleInterest = useCallback((id: string) => {
     setSelectedInterests(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
-  };
+  }, []);
 
-  const handleGenerate = async () => {
+  const handleGenerate = useCallback(async () => {
     if (!destination) return;
     setLoading(true);
     setError(null);
@@ -69,9 +73,9 @@ export const Planner: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [destination, budget, days, selectedInterests]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!user || !itinerary) return;
     setSaveStatus('saving');
     try {
@@ -86,13 +90,13 @@ export const Planner: React.FC = () => {
     } catch {
       setSaveStatus('idle');
     }
-  };
+  }, [user, itinerary, destination, budget]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setItinerary(null);
     setError(null);
     setActiveDayTab(0);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col gap-5 pb-8">
@@ -123,7 +127,7 @@ export const Planner: React.FC = () => {
                       : 'bg-white/5 border-white/8 text-text-secondary hover:border-white/20'
                   }`}
                 >
-                  <MapPin size={14} className={destination === c ? 'text-primary' : 'text-text-muted'} />
+                  <MapPin size={14} className={destination === c ? 'text-primary' : 'text-text-muted'} aria-hidden="true" />
                   {c}
                 </button>
               ))}
@@ -152,8 +156,9 @@ export const Planner: React.FC = () => {
 
           {/* Days */}
           <div>
-            <label className="section-label mb-2 block">Duration: {days} day{days > 1 ? 's' : ''}</label>
+            <label htmlFor="duration-range" className="section-label mb-2 block">Duration: {days} day{days > 1 ? 's' : ''}</label>
             <input
+              id="duration-range"
               type="range"
               min={1}
               max={7}
@@ -198,9 +203,9 @@ export const Planner: React.FC = () => {
               </>
             ) : (
               <>
-                <Sparkles size={16} />
+                <Sparkles size={16} aria-hidden="true" />
                 Generate {days}-Day Itinerary
-                <Send size={14} />
+                <Send size={14} aria-hidden="true" />
               </>
             )}
           </button>
@@ -210,7 +215,7 @@ export const Planner: React.FC = () => {
       {/* ── Error state ── */}
       {error && (
         <div className="glass-card p-4 flex items-center gap-3 border-amber-500/20 bg-amber-500/5">
-          <AlertTriangle size={18} className="text-amber-400 shrink-0" />
+          <AlertTriangle size={18} className="text-amber-400 shrink-0" aria-hidden="true" />
           <p className="text-sm text-amber-300">{error}</p>
         </div>
       )}
@@ -236,7 +241,7 @@ export const Planner: React.FC = () => {
                   onClick={handleReset}
                   className="btn-ghost flex items-center gap-1.5 text-xs py-2 px-3"
                 >
-                  <RotateCcw size={13} /> Redo
+                  <RotateCcw size={13} aria-hidden="true" /> Redo
                 </button>
                 <button
                   onClick={handleSave}
@@ -244,10 +249,10 @@ export const Planner: React.FC = () => {
                   className="btn-primary flex items-center gap-1.5 text-xs py-2 px-3 disabled:opacity-60"
                 >
                   {saveStatus === 'saved'
-                    ? <><CheckCircle size={13} /> Saved!</>
+                    ? <><CheckCircle size={13} aria-hidden="true" /> Saved!</>
                     : saveStatus === 'saving'
                     ? <><svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" /><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" className="opacity-75" /></svg> Saving</>
-                    : <><Save size={13} /> Save Trip</>
+                    : <><Save size={13} aria-hidden="true" /> Save Trip</>
                   }
                 </button>
               </div>
@@ -281,7 +286,7 @@ export const Planner: React.FC = () => {
               >
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
-                    <Calendar size={14} className="text-primary" />
+                    <Calendar size={14} className="text-primary" aria-hidden="true" />
                     <span className="section-label">Day {itinerary[activeDayTab].day}</span>
                   </div>
                   <h3 className="font-black text-text-primary text-base">{itinerary[activeDayTab].theme}</h3>
@@ -290,8 +295,8 @@ export const Planner: React.FC = () => {
 
                 {/* Activities timeline */}
                 <div className="flex flex-col gap-3">
-                  {itinerary[activeDayTab].activities?.map((act, idx) => (
-                    <div key={idx} className="flex gap-3">
+                  {itinerary[activeDayTab].activities?.map((act) => (
+                    <div key={`${act.time}-${act.name || act.activityName}`} className="flex gap-3">
                       <div className="flex flex-col items-center">
                         <span className="text-[10px] font-bold text-text-muted w-12 text-right shrink-0">{act.time}</span>
                       </div>
@@ -299,7 +304,7 @@ export const Planner: React.FC = () => {
                         <div className="w-px bg-white/10 self-center h-full absolute" />
                         <div className="glass-card p-3 relative">
                           <div className="flex items-center justify-between mb-0.5">
-                            <span className="font-bold text-sm text-text-primary">{act.name}</span>
+                            <span className="font-bold text-sm text-text-primary">{act.name || act.activityName}</span>
                             {act.cost && (
                               <span className="text-[11px] text-emerald-400 font-semibold">{act.cost}</span>
                             )}
@@ -317,7 +322,7 @@ export const Planner: React.FC = () => {
                 {/* Local tip */}
                 {itinerary[activeDayTab].tip && (
                   <div className="flex items-start gap-2.5 bg-primary/8 border border-primary/20 rounded-xl p-3">
-                    <Sparkles size={14} className="text-primary shrink-0 mt-0.5" />
+                    <Sparkles size={14} className="text-primary shrink-0 mt-0.5" aria-hidden="true" />
                     <p className="text-xs text-text-secondary leading-relaxed">{itinerary[activeDayTab].tip}</p>
                   </div>
                 )}
@@ -333,7 +338,7 @@ export const Planner: React.FC = () => {
           onClick={handleReset}
           className="flex items-center gap-1.5 text-xs text-text-muted hover:text-rose-400 transition-colors mx-auto"
         >
-          <Trash2 size={13} /> Discard plan
+          <Trash2 size={13} aria-hidden="true" /> Discard plan
         </button>
       )}
     </div>
