@@ -47,7 +47,7 @@ export const DestinationPopup: React.FC<DestinationPopupProps> = ({
     };
 
     checkActiveDestination();
-  }, [user]);
+  }, [user, onSelectCity]);
 
   const handleSelect = async (cityName: string) => {
     if (!user) return;

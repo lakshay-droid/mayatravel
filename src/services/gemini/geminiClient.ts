@@ -17,11 +17,19 @@ const LOCAL_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const PROXY_ENDPOINT = '/.netlify/functions/gemini-proxy';
 const MODEL_NAME = 'gemini-2.5-flash';
 
-// Helper to delay simulation (feels realistic for fallback mock calls)
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// Helper to delay simulation (feels realistic for fallback mock calls, bypassed in tests)
+const sleep = (ms: number) => {
+  if (import.meta.env.MODE === 'test') {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 // Secure API caller that handles Netlify functions or direct fallback
 async function callGeminiAPI(prompt: string): Promise<any> {
+  if (import.meta.env.MODE === 'test') {
+    throw new Error('Test environment: bypassing api call');
+  }
   const payload = {
     contents: [
       {
@@ -103,7 +111,7 @@ export async function generateStory(attractionName: string): Promise<StoryConten
     const prompt = getStoryPrompt(attractionName);
     const story = await callGeminiAPI(prompt);
     return story as StoryContent;
-  } catch (error) {
+  } catch {
     console.log(`Using story mock fallback for: ${attractionName}`);
     await sleep(MOCK_DELAY);
     
@@ -149,7 +157,7 @@ export async function generateTripPlan(
     const prompt = getTripPlanPrompt(destination, budget, dates, groupSize, interests);
     const plan = await callGeminiAPI(prompt);
     return plan as ItineraryDay[];
-  } catch (error) {
+  } catch {
     console.log(`Using trip plan mock fallback for: ${destination}`);
     await sleep(MOCK_DELAY);
 
@@ -278,7 +286,7 @@ export async function generateDestinationRecommendations(
     const prompt = getDestinationRecommendationsPrompt(month, budget, preferences);
     const recs = await callGeminiAPI(prompt);
     return recs as DestinationRecommendation[];
-  } catch (error) {
+  } catch {
     console.log('Using destination recommendations mock fallback');
     await sleep(MOCK_DELAY);
     return FALLBACK_RECOMMENDATIONS.default;
@@ -293,7 +301,7 @@ export async function generateLocalCompanionInsights(
     const prompt = getLocalCompanionPrompt(city, preferences);
     const insights = await callGeminiAPI(prompt);
     return insights as CompanionInsights;
-  } catch (error) {
+  } catch {
     console.log(`Using local companion mock fallback for: ${city}`);
     await sleep(MOCK_DELAY);
     

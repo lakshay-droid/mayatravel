@@ -1,126 +1,292 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Compass, Sparkles, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Compass, Sparkles, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+
+const HERO_IMAGES = [
+  {
+    url: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1400&q=80',
+    city: 'Jaipur',
+    tagline: 'Pink City · Rajput Heritage',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1561361513-2d000a50f0db?auto=format&fit=crop&w=1400&q=80',
+    city: 'Varanasi',
+    tagline: 'Sacred Ghats · Ancient Rituals',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80',
+    city: 'Goa',
+    tagline: 'Golden Beaches · Spice Gardens',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1400&q=80',
+    city: 'Dehradun',
+    tagline: 'Valley of Doon · Himalayan Gateway',
+  },
+];
 
 export const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
-  const { login, loading, error: authError } = useAuth();
   const navigate = useNavigate();
+  const { login, signup } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
+  // Prefill demo user by default per user request
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
 
-    // Frontend validation & sanitization
-    const cleanUsername = username.trim();
-    const cleanPassword = password.trim();
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [heroIdx, setHeroIdx] = useState(0);
 
-    if (!cleanUsername || !cleanPassword) {
-      setFormError('Please enter both username and password.');
-      return;
-    }
+  // Auto-cycle hero images every 4 seconds
+  useEffect(() => {
+    const id = setInterval(() => setHeroIdx((i) => (i + 1) % HERO_IMAGES.length), 4000);
+    return () => clearInterval(id);
+  }, []);
 
-    const success = await login(cleanUsername, cleanPassword);
-    if (success) {
-      navigate('/');
+  const handleToggleMode = () => {
+    setIsSignUp(!isSignUp);
+    setError(null);
+    if (!isSignUp) {
+      // Clear inputs for fresh signup
+      setUsername('');
+      setPassword('');
+      setEmail('');
+    } else {
+      // Restore demo credentials for convenience
+      setUsername('admin');
+      setPassword('admin123');
     }
   };
 
-  const activeError = formError || authError;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (isSignUp) {
+        if (!email.trim() || !username.trim() || !password.trim()) {
+          setError('All fields are required.');
+          setLoading(false);
+          return;
+        }
+        const result = await signup(email, password, username);
+        if (result.success) {
+          navigate('/onboarding', { replace: true });
+        } else {
+          setError(result.error || 'Signup failed.');
+        }
+      } else {
+        if (!username.trim() || !password.trim()) {
+          setError('Please enter your username and password.');
+          setLoading(false);
+          return;
+        }
+        const result = await login(username, password);
+        if (result.success) {
+          const hasOnboarded = localStorage.getItem(`onboarded_${username.trim()}`);
+          navigate(hasOnboarded ? '/' : '/onboarding', { replace: true });
+        } else {
+          setError(result.error || 'Invalid credentials.');
+        }
+      }
+    } catch {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const currentHero = HERO_IMAGES[heroIdx];
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-slate-50 p-6 overflow-hidden">
-      {/* Dynamic Background Gradients (Landon Norris Style) */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px]" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-400/10 blur-[120px]" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-background flex items-end md:items-center justify-center">
+      {/* Full-screen rotating hero background */}
+      <AnimatePresence mode="sync">
+        <motion.div
+          key={heroIdx}
+          className="absolute inset-0"
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1, ease: 'easeInOut' }}
+        >
+          <img
+            src={currentHero.url}
+            alt={currentHero.city}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/80" />
+        </motion.div>
+      </AnimatePresence>
 
+      {/* City label top-left */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        key={`label-${heroIdx}`}
+        initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-md"
+        className="absolute top-8 left-6 z-10"
       >
-        {/* Brand Header */}
-        <div className="flex flex-col items-center mb-8 select-none">
-          <div className="w-14 h-14 rounded-3xl bg-gradient-to-tr from-primary to-emerald-400 flex items-center justify-center text-white shadow-xl shadow-primary/20 mb-4">
-            <Compass size={28} className="animate-spin-slow" />
-          </div>
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-1.5">
-            LocalLens <Sparkles size={16} className="text-primary fill-primary" />
-          </h1>
-          <p className="text-slate-400 text-sm mt-1.5 font-medium text-center px-4">
-            Discover Places. Experience Culture. Travel Like a Local.
-          </p>
-        </div>
+        <p className="text-white/50 text-xs font-bold uppercase tracking-widest">{currentHero.tagline}</p>
+        <h2 className="text-white text-2xl font-black tracking-tight">{currentHero.city}</h2>
+      </motion.div>
 
-        {/* Login Card */}
-        <div className="glass-effect rounded-3xl p-8 shadow-xl border border-white/60">
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Sign In</h2>
-          <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-6">
-            Enter your credentials to start exploring
-          </p>
+      {/* Hero indicator dots */}
+      <div className="absolute top-10 right-6 z-10 flex flex-col gap-1.5">
+        {HERO_IMAGES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setHeroIdx(i)}
+            className={`w-1 rounded-full transition-all duration-500 ${
+              i === heroIdx ? 'h-6 bg-white' : 'h-2 bg-white/30'
+            }`}
+            aria-label={`View ${HERO_IMAGES[i].city}`}
+          />
+        ))}
+      </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {activeError && (
-              <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 bg-rose-50 border border-rose-100 p-4 rounded-2xl text-rose-600 text-xs font-semibold leading-relaxed"
-              >
-                <AlertCircle size={16} className="shrink-0" />
-                <span>{activeError}</span>
-              </motion.div>
-            )}
-
-            <Input
-              label="Username"
-              type="text"
-              placeholder="e.g. admin"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={loading}
-              autoComplete="username"
-              autoFocus
-            />
-
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              autoComplete="current-password"
-            />
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              isLoading={loading}
-              className="w-full mt-2"
-            >
-              Sign In
-            </Button>
-          </form>
-
-          {/* Demo Login Credentials Helper */}
-          <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col items-center gap-2 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 select-none">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Demo Credentials</span>
-            <div className="flex justify-between w-full text-xs font-medium text-slate-600">
-              <span>Username: <strong className="text-slate-800">admin</strong></span>
-              <span>Password: <strong className="text-slate-800">admin123</strong></span>
+      {/* Glass login card — slide up from bottom */}
+      <motion.div
+        initial={{ y: 60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-sm mx-4 mb-8 md:mb-0"
+      >
+        <div className="bg-surface/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-7 shadow-premium">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5 mb-7">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-light flex items-center justify-center shadow-glow">
+              <Compass size={20} className="text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1">
+                <span className="font-black text-lg text-text-primary tracking-tight">LocalLens</span>
+                <Sparkles size={12} className="text-primary" />
+              </div>
+              <p className="text-[10px] text-text-muted font-semibold uppercase tracking-widest">AI Travel Companion</p>
             </div>
           </div>
+
+          <h1 className="text-xl font-bold text-text-primary mb-1">
+            {isSignUp ? 'Create account' : 'Welcome back'}
+          </h1>
+          <p className="text-sm text-text-secondary mb-6">
+            {isSignUp ? 'Sign up to explore destinations with AI' : 'Sign in to explore destinations with AI'}
+          </p>
+
+          {/* Error */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3 mb-4"
+              role="alert"
+            >
+              <AlertCircle size={15} className="text-rose-400 shrink-0" />
+              <p className="text-rose-300 text-xs font-medium">{error}</p>
+            </motion.div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+            {isSignUp && (
+              <div>
+                <label htmlFor="email" className="block text-xs font-semibold text-text-secondary mb-1.5">
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-dark"
+                  aria-required="true"
+                />
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="username" className="block text-xs font-semibold text-text-secondary mb-1.5">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                autoComplete="username"
+                placeholder="e.g. admin"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="input-dark"
+                aria-required="true"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-xs font-semibold text-text-secondary mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPw ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input-dark pr-12"
+                  aria-required="true"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                  aria-label={showPw ? 'Hide password' : 'Show password'}
+                >
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary mt-2 w-full flex items-center justify-center gap-2"
+            >
+              {loading && (
+                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" className="opacity-75" />
+                </svg>
+              )}
+              {loading ? (isSignUp ? 'Signing up...' : 'Signing in...') : (isSignUp ? 'Sign Up' : 'Continue')}
+            </button>
+          </form>
+
+          {/* Toggle view link */}
+          <div className="mt-5 text-center">
+            <button
+              onClick={handleToggleMode}
+              className="text-xs text-primary font-semibold hover:underline"
+            >
+              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+            </button>
+          </div>
+
+          {!isSignUp && (
+            <p className="text-center text-[10px] text-text-muted mt-4">
+              Demo defaults: <span className="text-text-secondary font-semibold">admin / admin123</span> (Prefilled!)
+            </p>
+          )}
         </div>
       </motion.div>
     </div>
   );
 };
+
 export default Login;

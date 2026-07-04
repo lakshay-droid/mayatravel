@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { createClient } from '@supabase/supabase-js';
+
 
 // Environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';

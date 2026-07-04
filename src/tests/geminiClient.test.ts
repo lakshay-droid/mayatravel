@@ -27,7 +27,7 @@ describe('Gemini Service Wrapper & Prompts', () => {
     expect(plan).toBeDefined();
     expect(plan.length).toBe(3);
     expect(plan[0].day).toBe(1);
-    expect(plan[0].morning.activityName).toContain('Robber\'s Cave');
+    expect(plan[0].morning?.activityName).toContain('Robber\'s Cave');
   });
 
   it('should resolve destination recommendation fallbacks', async () => {

@@ -9,9 +9,10 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface LocalCompanionProps {
   city: string;
+  compact?: boolean;
 }
 
-export const LocalCompanion: React.FC<LocalCompanionProps> = ({ city }) => {
+export const LocalCompanion: React.FC<LocalCompanionProps> = ({ city, compact = false }) => {
   const { user } = useAuth();
   const [insights, setInsights] = useState<CompanionInsights | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +53,7 @@ export const LocalCompanion: React.FC<LocalCompanionProps> = ({ city }) => {
         }
         const data = await generateLocalCompanionInsights(city, prefsList);
         setInsights(data);
-      } catch (err) {
+      } catch {
         setError('The companion is catching its breath. Try reloading shortly.');
       } finally {
         setLoading(false);
@@ -63,22 +64,30 @@ export const LocalCompanion: React.FC<LocalCompanionProps> = ({ city }) => {
   }, [city, preferences]);
 
   if (loading) {
+    if (compact) return <span className="text-text-muted text-sm animate-pulse">Loading local insights…</span>;
     return (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse select-none">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-64 bg-slate-200/50 rounded-3xl border border-slate-100" />
+          <div key={i} className="h-64 bg-white/5 rounded-3xl border border-white/7" />
         ))}
       </div>
     );
   }
 
   if (error || !insights) {
+    if (compact) return <span className="text-text-muted text-sm">{error || 'Companion offline'}</span>;
     return (
-      <div className="w-full text-center py-10 bg-slate-50 border border-slate-100 rounded-3xl">
-        <AlertTriangle size={32} className="text-slate-400 mx-auto mb-2" />
-        <span className="text-sm font-semibold text-slate-500">{error || 'Failed to fetch companion insights'}</span>
+      <div className="w-full text-center py-10 bg-white/5 border border-white/7 rounded-3xl">
+        <AlertTriangle size={32} className="text-text-muted mx-auto mb-2" />
+        <span className="text-sm font-semibold text-text-secondary">{error || 'Failed to fetch companion insights'}</span>
       </div>
     );
+  }
+
+  // Compact mode — just show first weather insight inline
+  if (compact) {
+    const tip = insights.weather?.summary || insights.localTips?.[0] || `Explore ${city} with confidence today.`;
+    return <p className="text-sm text-text-primary leading-snug line-clamp-1">{tip}</p>;
   }
 
   // Get matching reason list based on traveler preferences

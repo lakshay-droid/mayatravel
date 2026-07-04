@@ -38,7 +38,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({
       try {
         const data = await generateStory(attractionName);
         setStory(data);
-      } catch (err) {
+      } catch {
         setError('Failed to conjure the story for this place. The local spirits are silent right now.');
       } finally {
         setLoading(false);

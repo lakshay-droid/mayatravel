@@ -18,7 +18,8 @@ export interface UserProfile {
 
 export interface Activity {
   time: string;
-  activityName: string;
+  name?: string;
+  activityName?: string;
   description: string;
   cost: string;
   duration: string;
@@ -26,16 +27,20 @@ export interface Activity {
 
 export interface ItineraryDay {
   day: number;
-  date: string;
-  title: string;
-  morning: Activity;
-  afternoon: Activity;
-  evening: Activity;
-  foodRecommendations: string[];
-  transport: string;
-  estimatedCosts: string;
-  weatherConsiderations: string;
-  packingSuggestions: string[];
+  date?: string;
+  title?: string;
+  theme?: string;
+  morning?: Activity;
+  afternoon?: Activity;
+  evening?: Activity;
+  activities?: Activity[];
+  foodRecommendations?: string[];
+  transport?: string;
+  estimatedCosts?: string;
+  estimatedBudget?: string;
+  weatherConsiderations?: string;
+  packingSuggestions?: string[];
+  tip?: string;
 }
 
 export interface TripPlan {
@@ -43,10 +48,11 @@ export interface TripPlan {
   user_id?: string;
   destination: string;
   budget: string;
-  dates: string;
-  group_size: number;
-  interests: string[];
+  dates?: string;
+  group_size?: number;
+  interests?: string[];
   itinerary: ItineraryDay[];
+  days?: ItineraryDay[];
   created_at?: string;
 }
 
@@ -118,4 +124,6 @@ export interface CompanionInsights {
   dressCode: string;
   nearbyWashrooms: string[];
   weatherForecast: string;
+  weather?: { summary: string };
+  localTips?: string[];
 }

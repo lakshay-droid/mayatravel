@@ -1,7 +1,7 @@
 // Netlify serverless function to proxy Gemini API requests securely.
 // This function reads the private GEMINI_API_KEY environment variable on the server side.
 
-exports.handler = async function(event, context) {
+exports.handler = async function(event, _context) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',

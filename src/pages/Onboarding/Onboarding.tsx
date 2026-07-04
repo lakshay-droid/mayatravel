@@ -1,206 +1,251 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Check, Sparkles, Compass } from 'lucide-react';
+import { Check, Compass, Sparkles } from 'lucide-react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/ui/Button';
 
-// Onboarding step questions data
+// ─── Step 1 Data: Travel Personality ────────────────────────────────────────
 const PERSONALITIES = [
-  { id: 'Adventure', label: 'Adventure', desc: 'Thrive on hikes, climbs, rafting, and adrenaline.', image: 'https://images.unsplash.com/photo-1533240332313-0db49b439ad3?auto=format&fit=crop&w=400&q=80' },
-  { id: 'Culture', label: 'Culture', desc: 'Dive into rituals, arts, local music, and events.', image: 'https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&w=400&q=80' },
-  { id: 'Foodie', label: 'Foodie', desc: 'Explore the world through spices, stalls, and courses.', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80' },
-  { id: 'Nature', label: 'Nature', desc: 'Find peace in wilderness, valleys, and national parks.', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=400&q=80' },
-  { id: 'Luxury', label: 'Luxury', desc: 'Unwind in premium stays, boutique spas, and private transport.', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
-  { id: 'Photography', label: 'Photography', desc: 'Hunt golden-hour viewpoints and stunning layouts.', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80' },
-  { id: 'History', label: 'History', desc: 'Explore ruins, palaces, museums, and local lore.', image: 'https://images.unsplash.com/photo-1503177119275-0aa32b31d468?auto=format&fit=crop&w=400&q=80' }
+  {
+    id: 'Adventure',
+    emoji: '🧗',
+    label: 'Adventure Seeker',
+    desc: 'Hikes, climbs, rafting & adrenaline',
+    image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=600&q=80',
+    color: 'from-orange-600/80 to-orange-950/90',
+  },
+  {
+    id: 'Culture',
+    emoji: '🎭',
+    label: 'Culture Diver',
+    desc: 'Rituals, arts, local music & events',
+    image: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&w=600&q=80',
+    color: 'from-purple-600/80 to-purple-950/90',
+  },
+  {
+    id: 'Foodie',
+    emoji: '🍜',
+    label: 'Food Explorer',
+    desc: 'Spices, street stalls & local flavors',
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80',
+    color: 'from-rose-600/80 to-rose-950/90',
+  },
+  {
+    id: 'Nature',
+    emoji: '🌿',
+    label: 'Nature Wanderer',
+    desc: 'Valleys, wildlife & national parks',
+    image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=600&q=80',
+    color: 'from-emerald-600/80 to-emerald-950/90',
+  },
 ];
 
-const DESTINATIONS = [
-  { id: 'Mountains', label: 'Mountains', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Beaches', label: 'Beaches', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Cities', label: 'Cities', image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Heritage', label: 'Heritage', image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Forests', label: 'Forests', image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Deserts', label: 'Deserts', image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80' }
+// ─── Step 2 Data: City Selection ─────────────────────────────────────────────
+const CITIES = [
+  {
+    id: 'Jaipur',
+    label: 'Jaipur',
+    state: 'Rajasthan',
+    desc: 'Royal Pink City & Palaces',
+    image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: 'Varanasi',
+    label: 'Varanasi',
+    state: 'Uttar Pradesh',
+    desc: 'Sacred Ghats & Ancient Lore',
+    image: 'https://images.unsplash.com/photo-1598977123418-45f04b01d1bb?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: 'Goa',
+    label: 'Goa',
+    state: 'Konkan',
+    desc: 'Beaches & Portuguese Heritage',
+    image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: 'Dehradun',
+    label: 'Dehradun',
+    state: 'Uttarakhand',
+    desc: 'Valley Mists & Himalayan Gateway',
+    image: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=600&q=80',
+  },
 ];
 
-const TRANSPORTS = [
-  { id: 'Flight', label: 'Flight', desc: 'Quick long-distance flights.' },
-  { id: 'Train', label: 'Train', desc: 'Scenic rail corridors.' },
-  { id: 'Bus', label: 'Bus', desc: 'Affordable highway routes.' },
-  { id: 'Car', label: 'Car', desc: 'Flexible self-drive or cab roadtrips.' },
-  { id: 'Bike', label: 'Bike', desc: 'Two-wheeled local trail exploration.' },
-  { id: 'Walking', label: 'Walking', desc: 'Pedestrian pace, exploring slow alleys.' }
+// ─── Step 3 Data: Trip Style (Budget + Group combined) ───────────────────────
+const BUDGETS = [
+  { id: 'Budget', label: 'Backpacker', icon: '🎒', desc: 'Hostels & local buses' },
+  { id: 'Mid-range', label: 'Comfort', icon: '🏨', desc: 'Hotels & rental cabs' },
+  { id: 'Luxury', label: 'Luxury', icon: '✨', desc: 'Resorts & private guides' },
 ];
 
 const GROUPS = [
-  { id: 'Solo', label: 'Solo Traveler', desc: 'On a personal voyage of self-discovery.' },
-  { id: 'Couple', label: 'As a Couple', desc: 'Shared travel with a significant other.' },
-  { id: 'Friends', label: 'With Friends', desc: 'Social adventure and collective activities.' },
-  { id: 'Family', label: 'With Family', desc: 'Comfort-first, multi-generational bonding.' }
+  { id: 'Solo', label: 'Solo', icon: '🧍' },
+  { id: 'Couple', label: 'Couple', icon: '👫' },
+  { id: 'Friends', label: 'Friends', icon: '👯' },
+  { id: 'Family', label: 'Family', icon: '👨‍👩‍👧' },
 ];
 
-const FOODS = [
-  { id: 'Vegetarian', label: 'Vegetarian Only', desc: 'Herbivore dishes and local dairy specialties.' },
-  { id: 'Non-Vegetarian', label: 'Non-Vegetarian', desc: 'Enjoying traditional meats, poultry, and fish.' },
-  { id: 'Vegan', label: 'Vegan / Plant-based', desc: 'No animal derivatives or products.' },
-  { id: 'Local Cuisine', label: 'Local Cuisine Cult', desc: 'Must eat whatever regional families prepare.' },
-  { id: 'Street Food', label: 'Street Food Collector', desc: 'Finding hidden stalls and local spicy snacks.' }
-];
-
-const BUDGETS = [
-  { id: 'Budget', label: 'Budget Backpacking', desc: 'Homestays, public transit, and smart spending.' },
-  { id: 'Mid-range', label: 'Mid-range Comfort', desc: 'Clean hotels, rental cars, and comfortable dining.' },
-  { id: 'Luxury', label: 'Luxury Leisure', desc: 'Five-star resorts, private guides, and fine dining.' }
-];
+const TOTAL_STEPS = 3;
 
 export const Onboarding: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);
-  const [personality, setPersonality] = useState<string>('');
-  const [destination, setDestination] = useState<string>('');
-  const [transport, setTransport] = useState<string>('');
-  const [group, setGroup] = useState<string>('');
-  const [food, setFood] = useState<string>('');
-  const [budget, setBudget] = useState<string>('');
-
+  const [dir, setDir] = useState(1);
+  const [personality, setPersonality] = useState('');
+  const [city, setCity] = useState('');
+  const [budget, setBudget] = useState('');
+  const [group, setGroup] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const totalSteps = 6;
-
-  const nextStep = () => {
-    if (step < totalSteps) setStep(step + 1);
-  };
-
-  const prevStep = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
-  const isStepValid = () => {
+  const isValid = () => {
     if (step === 1) return !!personality;
-    if (step === 2) return !!destination;
-    if (step === 3) return !!transport;
-    if (step === 4) return !!group;
-    if (step === 5) return !!food;
-    if (step === 6) return !!budget;
+    if (step === 2) return !!city;
+    if (step === 3) return !!budget && !!group;
     return false;
+  };
+
+
+
+  const goPrev = () => {
+    if (step > 1) { setDir(-1); setStep(step - 1); }
+  };
+
+  // Automatically advance to Step 2 upon selecting personality
+  const handleSelectPersonality = (pId: string) => {
+    setPersonality(pId);
+    setTimeout(() => {
+      setDir(1);
+      setStep(2);
+    }, 300);
+  };
+
+  // Automatically advance to Step 3 upon selecting city
+  const handleSelectCity = (cId: string) => {
+    setCity(cId);
+    setTimeout(() => {
+      setDir(1);
+      setStep(3);
+    }, 300);
   };
 
   const handleFinish = async () => {
     if (!user) return;
     setSubmitting(true);
-
     try {
-      // Save travel preferences to Supabase
-      const { error } = await supabase
-        .from('travel_preferences')
-        .upsert({
-          user_id: user.id,
-          personality: personality as any,
-          favorite_destination: destination as any,
-          transport_pref: transport as any,
-          travel_group: group as any,
-          food_pref: food as any,
-          budget: budget as any
-        });
+      await supabase.from('travel_preferences').upsert({
+        user_id: user.id,
+        personality: personality as any,
+        favorite_destination: city as any,
+        transport_pref: 'Car' as any,
+        travel_group: group as any,
+        food_pref: 'Local Cuisine' as any,
+        budget: budget as any,
+      });
 
-      if (error) {
-        throw error;
-      }
+      // Store city choice and onboarding status in localStorage
+      localStorage.setItem('preferred_city', city);
+      localStorage.setItem(`onboarded_${user.username}`, '1');
 
-      // Redirect to homepage
-      navigate('/');
-    } catch (err) {
-      console.error('Failed to submit onboarding answers', err);
-      alert('Failed to save preferences. Please try again.');
+      navigate('/', { replace: true });
+    } catch {
+      // Offline fallback
+      localStorage.setItem('preferred_city', city);
+      localStorage.setItem(`onboarded_${user.username}`, '1');
+      navigate('/', { replace: true });
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Animation variants
   const slideVariants = {
-    initial: (dir: number) => ({ x: dir > 0 ? 100 : -100, opacity: 0 }),
-    animate: { x: 0, opacity: 1, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as any } },
-    exit: (dir: number) => ({ x: dir > 0 ? -100 : 100, opacity: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as any } })
+    initial: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
+    animate: { x: 0, opacity: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as any } },
+    exit: (d: number) => ({ x: d > 0 ? -80 : 80, opacity: 0, transition: { duration: 0.3 } }),
   };
 
-  const progressPercentage = (step / totalSteps) * 100;
-
   return (
-    <div className="relative min-h-screen w-full flex flex-col justify-between bg-slate-900 text-white p-6 md:p-12 overflow-hidden font-sans">
-      {/* Dynamic Background Gradients */}
-      <div className="absolute top-[-30%] right-[-10%] w-[60%] h-[60%] rounded-full bg-primary/10 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[-30%] left-[-10%] w-[60%] h-[60%] rounded-full bg-emerald-500/5 blur-[130px] pointer-events-none" />
+    <div className="relative min-h-screen w-full bg-background flex flex-col overflow-hidden pb-safe">
+      {/* Background blob */}
+      <div className="blob-accent w-[500px] h-[500px] bg-primary top-[-200px] right-[-200px]" />
+      <div className="blob-accent w-[400px] h-[400px] bg-primary-light bottom-[-150px] left-[-150px]" />
 
       {/* Header */}
-      <header className="w-full flex items-center justify-between z-10 select-none">
+      <header className="relative z-10 flex items-center justify-between px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary to-emerald-400 flex items-center justify-center text-white">
-            <Compass size={16} />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary to-primary-light flex items-center justify-center shadow-glow">
+            <Compass size={16} className="text-white" />
           </div>
-          <span className="font-bold text-sm tracking-tight flex items-center gap-0.5">
-            LocalLens <Sparkles size={10} className="text-primary fill-primary" />
+          <span className="font-black text-text-primary tracking-tight flex items-center gap-1">
+            LocalLens <Sparkles size={10} className="text-primary" />
           </span>
         </div>
-        <div className="text-xs font-semibold text-slate-400">
-          Step {step} of {totalSteps}
+
+        {/* Step dots */}
+        <div className="flex items-center gap-2">
+          {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+            <div
+              key={i}
+              className={`rounded-full transition-all duration-500 ${
+                i + 1 === step
+                  ? 'w-6 h-2 bg-primary'
+                  : i + 1 < step
+                  ? 'w-2 h-2 bg-primary/60'
+                  : 'w-2 h-2 bg-white/15'
+              }`}
+            />
+          ))}
         </div>
       </header>
 
-      {/* Progress Bar */}
-      <div className="w-full h-1 bg-slate-800 rounded-full mt-4 z-10">
-        <motion.div
-          className="h-full bg-gradient-to-r from-primary to-emerald-400 rounded-full"
-          initial={{ width: '0%' }}
-          animate={{ width: `${progressPercentage}%` }}
-          transition={{ duration: 0.3 }}
-        />
-      </div>
+      {/* Step content */}
+      <main className="relative z-10 flex-1 flex flex-col overflow-y-auto px-5">
+        <AnimatePresence mode="wait" custom={dir}>
 
-      {/* Body Content */}
-      <main className="flex-1 flex flex-col justify-center max-w-4xl w-full mx-auto my-8 z-10 overflow-y-auto pr-1">
-        <AnimatePresence mode="wait" custom={step}>
+          {/* ── STEP 1: Personality (Vertical Portrait Cards) ── */}
           {step === 1 && (
             <motion.div
               key="step1"
+              custom={dir}
               variants={slideVariants}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex flex-col"
+              className="flex-1 flex flex-col h-full justify-between"
             >
-              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-                What is your travel personality?
-              </h2>
-              <p className="text-slate-400 text-sm md:text-base mb-8">
-                Choose the lens through which you prefer to experience new places.
-              </p>
+              <div className="pt-4 pb-4">
+                <p className="section-label mb-1">Step 1 of 3</p>
+                <h2 className="text-2xl font-black text-text-primary leading-snug">
+                  What kind of traveler<br />are you?
+                </h2>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[50vh] overflow-y-auto p-1">
+              {/* High Portrait Cards Grid */}
+              <div className="grid grid-cols-2 gap-4 flex-1 h-[calc(100vh-210px)] min-h-[360px] pb-4">
                 {PERSONALITIES.map((p) => {
-                  const isSelected = personality === p.id;
+                  const sel = personality === p.id;
                   return (
                     <button
                       key={p.id}
-                      onClick={() => setPersonality(p.id)}
-                      className={`relative flex items-center gap-4 p-4 rounded-2xl text-left border transition-all duration-300 ${
-                        isSelected
-                          ? 'bg-primary/20 border-primary shadow-lg shadow-primary/10'
-                          : 'bg-slate-800/40 border-slate-700/60 hover:bg-slate-800/80 hover:border-slate-600'
+                      onClick={() => handleSelectPersonality(p.id)}
+                      className={`relative rounded-3xl overflow-hidden text-left transition-all duration-300 h-full flex flex-col justify-end p-4 group ${
+                        sel ? 'ring-2 ring-primary scale-[0.98]' : 'hover:scale-[0.99]'
                       }`}
                     >
-                      <img src={p.image} alt={p.label} className="w-12 h-12 rounded-xl object-cover" />
-                      <div className="flex-1">
-                        <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
-                          {p.label}
-                          {isSelected && <Check size={14} className="text-primary" />}
+                      <img src={p.image} alt={p.label} className="absolute inset-0 w-full h-full object-cover" />
+                      <div className={`absolute inset-0 bg-gradient-to-t ${p.color}`} />
+                      {sel && (
+                        <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                          <Check size={13} className="text-white" />
                         </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5 line-clamp-2">{p.desc}</div>
+                      )}
+                      <div className="relative z-10">
+                        <div className="text-2xl mb-1">{p.emoji}</div>
+                        <div className="font-extrabold text-base text-white leading-snug">{p.label}</div>
+                        <div className="text-white/60 text-[10px] leading-snug mt-1 line-clamp-2">{p.desc}</div>
                       </div>
                     </button>
                   );
@@ -209,51 +254,47 @@ export const Onboarding: React.FC = () => {
             </motion.div>
           )}
 
+          {/* ── STEP 2: City (Vertical Portrait Cards) ── */}
           {step === 2 && (
             <motion.div
               key="step2"
+              custom={dir}
               variants={slideVariants}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex flex-col"
+              className="flex-1 flex flex-col h-full justify-between"
             >
-              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-                Where is your soul at home?
-              </h2>
-              <p className="text-slate-400 text-sm md:text-base mb-8">
-                Select your favorite type of destination scenery.
-              </p>
+              <div className="pt-4 pb-4">
+                <p className="section-label mb-1">Step 2 of 3</p>
+                <h2 className="text-2xl font-black text-text-primary leading-snug">
+                  Where do you want<br />to explore first?
+                </h2>
+              </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[50vh] overflow-y-auto p-1">
-                {DESTINATIONS.map((d) => {
-                  const isSelected = destination === d.id;
+              {/* High Portrait Cards Grid */}
+              <div className="grid grid-cols-2 gap-4 flex-1 h-[calc(100vh-210px)] min-h-[360px] pb-4">
+                {CITIES.map((c) => {
+                  const sel = city === c.id;
                   return (
                     <button
-                      key={d.id}
-                      onClick={() => setDestination(d.id)}
-                      className={`group relative h-36 rounded-3xl overflow-hidden border transition-all duration-300 ${
-                        isSelected
-                          ? 'border-primary shadow-lg shadow-primary/20 scale-[0.98]'
-                          : 'border-slate-800 hover:border-slate-600'
+                      key={c.id}
+                      onClick={() => handleSelectCity(c.id)}
+                      className={`relative rounded-3xl overflow-hidden text-left transition-all duration-300 h-full flex flex-col justify-end p-4 group ${
+                        sel ? 'ring-2 ring-primary scale-[0.98]' : 'hover:scale-[0.99]'
                       }`}
                     >
-                      {/* Card Image */}
-                      <img
-                        src={d.image}
-                        alt={d.label}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-60"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
-                      
-                      {/* Card Content */}
-                      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                        <span className="font-bold text-sm tracking-tight text-white">{d.label}</span>
-                        {isSelected && (
-                          <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                            <Check size={12} className="text-white" />
-                          </div>
-                        )}
+                      <img src={c.image} alt={c.label} className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 photo-overlay" />
+                      {sel && (
+                        <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                          <Check size={13} className="text-white" />
+                        </div>
+                      )}
+                      <div className="relative z-10">
+                        <div className="font-extrabold text-lg text-white leading-none">{c.label}</div>
+                        <div className="text-white/50 text-[10px] mt-1">{c.state}</div>
+                        <div className="text-white/70 text-[10px] mt-1 line-clamp-2">{c.desc}</div>
                       </div>
                     </button>
                   );
@@ -262,207 +303,102 @@ export const Onboarding: React.FC = () => {
             </motion.div>
           )}
 
+          {/* ── STEP 3: Budget + Group ── */}
           {step === 3 && (
             <motion.div
               key="step3"
+              custom={dir}
               variants={slideVariants}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex flex-col"
+              className="w-full flex-1 flex flex-col gap-6 pt-4 pb-4"
             >
-              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-                How do you prefer to travel?
-              </h2>
-              <p className="text-slate-400 text-sm md:text-base mb-8">
-                Your preferred choice of transit during local trips.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto p-1">
-                {TRANSPORTS.map((t) => {
-                  const isSelected = transport === t.id;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => setTransport(t.id)}
-                      className={`p-5 rounded-2xl text-left border transition-all duration-300 ${
-                        isSelected
-                          ? 'bg-primary/20 border-primary shadow-lg'
-                          : 'bg-slate-800/40 border-slate-700/60 hover:bg-slate-800/80 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-sm text-slate-100">{t.label}</span>
-                        {isSelected && <Check size={16} className="text-primary" />}
-                      </div>
-                      <p className="text-xs text-slate-400">{t.desc}</p>
-                    </button>
-                  );
-                })}
+              <div>
+                <p className="section-label mb-1">Step 3 of 3</p>
+                <h2 className="text-2xl font-black text-text-primary leading-snug">
+                  How do you like<br />to travel?
+                </h2>
               </div>
-            </motion.div>
-          )}
 
-          {step === 4 && (
-            <motion.div
-              key="step4"
-              variants={slideVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="flex flex-col"
-            >
-              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-                Who are you traveling with?
-              </h2>
-              <p className="text-slate-400 text-sm md:text-base mb-8">
-                Your typical travel group dynamics.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto p-1">
-                {GROUPS.map((g) => {
-                  const isSelected = group === g.id;
-                  return (
-                    <button
-                      key={g.id}
-                      onClick={() => setGroup(g.id)}
-                      className={`p-5 rounded-2xl text-left border transition-all duration-300 ${
-                        isSelected
-                          ? 'bg-primary/20 border-primary shadow-lg'
-                          : 'bg-slate-800/40 border-slate-700/60 hover:bg-slate-800/80 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-sm text-slate-100">{g.label}</span>
-                        {isSelected && <Check size={16} className="text-primary" />}
-                      </div>
-                      <p className="text-xs text-slate-400">{g.desc}</p>
-                    </button>
-                  );
-                })}
+              {/* Budget */}
+              <div>
+                <p className="text-xs font-bold text-text-secondary mb-3 uppercase tracking-wider">Budget Style</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {BUDGETS.map((b) => {
+                    const sel = budget === b.id;
+                    return (
+                      <button
+                        key={b.id}
+                        onClick={() => setBudget(b.id)}
+                        className={`glass-card p-4 text-center transition-all duration-300 ${
+                          sel ? 'border-primary/50 bg-primary/10 shadow-glow' : 'hover:border-white/20'
+                        }`}
+                      >
+                        <div className="text-2xl mb-2">{b.icon}</div>
+                        <div className={`text-sm font-bold ${sel ? 'text-primary' : 'text-text-primary'}`}>{b.label}</div>
+                        <div className="text-[11px] text-text-muted mt-0.5">{b.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </motion.div>
-          )}
 
-          {step === 5 && (
-            <motion.div
-              key="step5"
-              variants={slideVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="flex flex-col"
-            >
-              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-                What are your culinary rules?
-              </h2>
-              <p className="text-slate-400 text-sm md:text-base mb-8">
-                Food represents local culture. Choose what suits your palate.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[50vh] overflow-y-auto p-1">
-                {FOODS.map((f) => {
-                  const isSelected = food === f.id;
-                  return (
-                    <button
-                      key={f.id}
-                      onClick={() => setFood(f.id)}
-                      className={`p-4 rounded-2xl text-left border transition-all duration-300 ${
-                        isSelected
-                          ? 'bg-primary/20 border-primary shadow-lg'
-                          : 'bg-slate-800/40 border-slate-700/60 hover:bg-slate-800/80 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-sm text-slate-100">{f.label}</span>
-                        {isSelected && <Check size={16} className="text-primary" />}
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{f.desc}</p>
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-
-          {step === 6 && (
-            <motion.div
-              key="step6"
-              variants={slideVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="flex flex-col"
-            >
-              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-                Lastly, what is your budget style?
-              </h2>
-              <p className="text-slate-400 text-sm md:text-base mb-8">
-                This helps customize homestays and trip itinerary suggestions.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[50vh] overflow-y-auto p-1">
-                {BUDGETS.map((b) => {
-                  const isSelected = budget === b.id;
-                  return (
-                    <button
-                      key={b.id}
-                      onClick={() => setBudget(b.id)}
-                      className={`p-5 rounded-2xl text-left border transition-all duration-300 ${
-                        isSelected
-                          ? 'bg-primary/20 border-primary shadow-lg'
-                          : 'bg-slate-800/40 border-slate-700/60 hover:bg-slate-800/80 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-sm text-slate-100">{b.label}</span>
-                        {isSelected && <Check size={16} className="text-primary" />}
-                      </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">{b.desc}</p>
-                    </button>
-                  );
-                })}
+              {/* Group */}
+              <div>
+                <p className="text-xs font-bold text-text-secondary mb-3 uppercase tracking-wider">Traveling With</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {GROUPS.map((g) => {
+                    const sel = group === g.id;
+                    return (
+                      <button
+                        key={g.id}
+                        onClick={() => setGroup(g.id)}
+                        className={`glass-card p-3 text-center transition-all duration-300 ${
+                          sel ? 'border-primary/50 bg-primary/10 shadow-glow' : 'hover:border-white/20'
+                        }`}
+                      >
+                        <div className="text-xl mb-1">{g.icon}</div>
+                        <div className={`text-xs font-semibold ${sel ? 'text-primary' : 'text-text-secondary'}`}>{g.label}</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      {/* Navigation Buttons */}
-      <footer className="w-full flex items-center justify-between z-10 pt-4 border-t border-slate-800 select-none">
+      {/* Navigation footer */}
+      <footer className="relative z-10 px-6 py-4 flex items-center justify-between border-t border-white/5">
         <button
-          onClick={prevStep}
+          onClick={goPrev}
           disabled={step === 1}
-          className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all duration-200"
+          className="text-sm font-semibold text-text-secondary hover:text-text-primary disabled:opacity-30 transition-colors"
         >
-          <ChevronLeft size={16} />
           Back
         </button>
 
-        {step < totalSteps ? (
-          <Button
-            onClick={nextStep}
-            disabled={!isStepValid()}
-            variant="primary"
-            className="flex items-center gap-2"
-          >
-            Continue
-            <ChevronRight size={16} />
-          </Button>
-        ) : (
-          <Button
+        {/* Footer Next button is ONLY shown on Step 3 (renamed as Let's Go) since Step 1 & 2 transition automatically upon card selection */}
+        {step === 3 && (
+          <button
             onClick={handleFinish}
-            disabled={!isStepValid() || submitting}
-            isLoading={submitting}
-            variant="primary"
-            className="flex items-center gap-2 px-8"
+            disabled={!isValid() || submitting}
+            className="btn-primary flex items-center gap-2 disabled:opacity-40 disabled:pointer-events-none"
           >
-            Let's Explore
-            <ChevronRight size={16} />
-          </Button>
+            {submitting ? (
+              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" className="opacity-75" />
+              </svg>
+            ) : null}
+            {submitting ? 'Saving...' : "Let's Go"} {!submitting && <Sparkles size={14} />}
+          </button>
         )}
       </footer>
     </div>
   );
 };
+
 export default Onboarding;

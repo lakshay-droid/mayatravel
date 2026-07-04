@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { supabase } from '../../services/supabase/supabaseClient';
+import { supabase, isMockMode } from '../../services/supabase/supabaseClient';
 
 interface RequireAuthProps {
   children: React.ReactNode;
@@ -21,6 +21,14 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({
     const checkPreferences = async () => {
       if (!user) {
         setCheckingPreferences(false);
+        return;
+      }
+
+      // Live mode check: purge poisoned mock sessions (like usr-admin-123)
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
+      if (!isMockMode && !isUuid) {
+        sessionStorage.removeItem('locallens_user');
+        window.location.href = '/login';
         return;
       }
 
