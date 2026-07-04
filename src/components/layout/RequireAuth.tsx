@@ -3,11 +3,35 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase, isMockMode } from '../../services/supabase/supabaseClient';
 
+/**
+ * Props for the RequireAuth component.
+ * 
+ * @interface RequireAuthProps
+ */
 interface RequireAuthProps {
+  /**
+   * The child components to render when authentication is successful.
+   * @type {React.ReactNode}
+   */
   children: React.ReactNode;
+  /**
+   * Whether to check and enforce onboarding preference state.
+   * If true, non-onboarded users are redirected to the onboarding flow,
+   * and onboarded users attempting to access the onboarding page are redirected to the homepage.
+   * @type {boolean}
+   * @default true
+   */
   requireOnboarding?: boolean;
 }
 
+/**
+ * A route guard component that protects sub-routes, requiring users to be authenticated.
+ * It handles loading states, purges invalid/mock sessions in live production mode,
+ * and routes users based on their onboarding status.
+ * 
+ * @param {RequireAuthProps} props - Props for configuring the authorization guard.
+ * @returns {React.ReactElement} The rendered element or Navigate redirect.
+ */
 export const RequireAuth: React.FC<RequireAuthProps> = ({ 
   children, 
   requireOnboarding = true 

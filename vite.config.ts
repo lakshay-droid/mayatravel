@@ -21,6 +21,11 @@ export default defineConfig({
               priority: 30,
             },
             {
+              name: 'leaflet',
+              test: /node_modules[\\/]leaflet/,
+              priority: 25,
+            },
+            {
               name: 'motion',
               test: /node_modules[\\/]framer-motion/,
               priority: 20,

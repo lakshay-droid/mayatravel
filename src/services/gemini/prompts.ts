@@ -1,6 +1,13 @@
 import type { StoryContent, ItineraryDay, DestinationRecommendation, CompanionInsights } from '../../types';
 
 // Prompts templates to avoid repetition and enforce structured JSON
+/**
+ * Generates the system prompt for the Gemini AI model to construct an immersive,
+ * structured story about a specific heritage attraction.
+ * 
+ * @param {string} attractionName - The name of the tourist or heritage attraction.
+ * @returns {string} The formatted system prompt requesting structured JSON output.
+ */
 export const getStoryPrompt = (attractionName: string) => `
 You are a local cultural storyteller and heritage expert. Generate an immersive, detailed story about the attraction: "${attractionName}".
 Your output must be a valid JSON object matching the following structure (do not wrap in markdown code blocks, just raw JSON):
@@ -14,6 +21,17 @@ Your output must be a valid JSON object matching the following structure (do not
 }
 `;
 
+/**
+ * Generates the system prompt for the Gemini AI model to create a customized,
+ * day-by-day travel itinerary based on user preferences.
+ * 
+ * @param {string} destination - The target city or destination.
+ * @param {string} budget - The budget level (e.g., 'Economy', 'Luxury').
+ * @param {string} dates - The travel duration or specific dates.
+ * @param {number} groupSize - The number of people traveling.
+ * @param {string[]} interests - A list of user interests to customize activities.
+ * @returns {string} The formatted system prompt requesting structured JSON itinerary output.
+ */
 export const getTripPlanPrompt = (destination: string, budget: string, dates: string, groupSize: number, interests: string[]) => `
 You are an expert personalized travel planner. Create a premium, day-by-day travel itinerary for "${destination}" from ${dates}.
 The trip parameters are:
@@ -57,6 +75,15 @@ Output must be a valid JSON array of 3 days. Each element must match this struct
 ]
 `;
 
+/**
+ * Generates the system prompt for the Gemini AI model to recommend cultural or travel destinations
+ * in India based on month, budget, and travel preferences.
+ * 
+ * @param {string} month - The month of travel.
+ * @param {string} budget - The budget level.
+ * @param {string[]} preferences - User preferences filter (e.g., 'Adventure', 'History').
+ * @returns {string} The formatted system prompt requesting a structured JSON array of recommendations.
+ */
 export const getDestinationRecommendationsPrompt = (month: string, budget: string, preferences: string[]) => `
 Recommend 4 of the best cultural or travel destinations in India for the month of "${month}" on a "${budget}" budget. 
 Preferences filter: ${preferences.join(', ')}.
@@ -76,6 +103,14 @@ Output must be a valid JSON array of 4 objects matching this structure (do not w
 ]
 `;
 
+/**
+ * Generates the system prompt for the Gemini AI model to act as a virtual local companion,
+ * providing insights, etiquette, safety guides, and hidden gems for a city.
+ * 
+ * @param {string} city - The target city.
+ * @param {string[]} preferences - User travel preferences to tailor insights.
+ * @returns {string} The formatted system prompt requesting a structured JSON companion guide.
+ */
 export const getLocalCompanionPrompt = (city: string, preferences: string[]) => `
 You are a local virtual companion for "${city}". Generate custom local insights, safety guides, and cultural tips.
 User travel preferences: ${preferences.join(', ')}.
@@ -113,6 +148,12 @@ Output must be a valid JSON object matching this structure (do not wrap in markd
 // FALLBACK MOCK DATA FOR DESTINATIONS
 // ==========================================
 
+/**
+ * Mock fallback story data for popular attractions when the AI API is offline or unavailable.
+ * Maps attraction names to StoryContent objects containing history, legends, folklore, and travel tips.
+ * 
+ * @type {Record<string, StoryContent>}
+ */
 export const FALLBACK_STORIES: Record<string, StoryContent> = {
   "Robber's Cave": {
     history: "Robber's Cave (locally known as Guchhupani) is a natural river cave formation located near Dehradun. Historically, during the British rule in India, local bandits and robbers used this 600-meter-long cave complex as a hideout. They would plunder British caravans and escape into the narrow, dark crevice, using the complex cave structure to hide their loot and vanish into the wilderness.",
@@ -170,6 +211,12 @@ export const FALLBACK_STORIES: Record<string, StoryContent> = {
   }
 };
 
+/**
+ * Mock fallback day-by-day trip itineraries for popular cities when the AI API is offline or unavailable.
+ * Maps city names to arrays of ItineraryDay objects.
+ * 
+ * @type {Record<string, ItineraryDay[]>}
+ */
 export const FALLBACK_TRIP_PLANS: Record<string, ItineraryDay[]> = {
   "dehradun": [
     {
@@ -280,6 +327,11 @@ export const FALLBACK_TRIP_PLANS: Record<string, ItineraryDay[]> = {
   ]
 };
 
+/**
+ * Mock fallback destination recommendations when the AI API is offline or unavailable.
+ * 
+ * @type {Record<string, DestinationRecommendation[]>}
+ */
 export const FALLBACK_RECOMMENDATIONS: Record<string, DestinationRecommendation[]> = {
   "default": [
     {
@@ -325,6 +377,12 @@ export const FALLBACK_RECOMMENDATIONS: Record<string, DestinationRecommendation[
   ]
 };
 
+/**
+ * Mock fallback local companion insights for popular cities when the AI API is offline or unavailable.
+ * Maps city names to CompanionInsights objects containing hidden gems, safety advice, and dress codes.
+ * 
+ * @type {Record<string, CompanionInsights>}
+ */
 export const FALLBACK_COMPANION: Record<string, CompanionInsights> = {
   "dehradun": {
     city: "Dehradun",

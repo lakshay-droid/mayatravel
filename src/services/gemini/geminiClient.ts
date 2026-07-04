@@ -130,6 +130,13 @@ function parseGeminiResponse(data: GeminiResponse): unknown {
 // EXPOSED API METHODS
 // ==========================================
 
+/**
+ * Generates an immersive story about a specific heritage attraction.
+ * Calls the Gemini AI API, falling back to a local mock dataset if the API is offline/unavailable.
+ * 
+ * @param {string} attractionName - The name of the tourist attraction to generate a story for.
+ * @returns {Promise<StoryContent>} A promise that resolves to the structured story content.
+ */
 export async function generateStory(attractionName: string): Promise<StoryContent> {
   try {
     const prompt = getStoryPrompt(attractionName);
@@ -170,6 +177,17 @@ export async function generateStory(attractionName: string): Promise<StoryConten
   }
 }
 
+/**
+ * Generates a day-by-day customized travel itinerary based on budget, dates, group size, and interests.
+ * Calls the Gemini AI API, falling back to a local mock dataset if the API is offline/unavailable.
+ * 
+ * @param {string} destination - The target travel destination.
+ * @param {string} budget - The budget level preference (e.g. 'Economy', 'Standard', 'Luxury').
+ * @param {string} dates - The trip date range or duration.
+ * @param {number} groupSize - The size of the travel group.
+ * @param {string[]} interests - A list of user interests (e.g. 'History', 'Adventure').
+ * @returns {Promise<ItineraryDay[]>} A promise that resolves to an array of daily itineraries.
+ */
 export async function generateTripPlan(
   destination: string, 
   budget: string, 
@@ -301,6 +319,15 @@ export async function generateTripPlan(
   }
 }
 
+/**
+ * Generates cultural or travel destination recommendations in India based on month, budget, and travel preferences.
+ * Calls the Gemini AI API, falling back to a local mock dataset if the API is offline/unavailable.
+ * 
+ * @param {string} month - The month of travel.
+ * @param {string} budget - The budget tier.
+ * @param {string[]} preferences - User travel preferences.
+ * @returns {Promise<DestinationRecommendation[]>} A promise that resolves to recommended destinations.
+ */
 export async function generateDestinationRecommendations(
   month: string, 
   budget: string, 
@@ -317,6 +344,14 @@ export async function generateDestinationRecommendations(
   }
 }
 
+/**
+ * Generates local companion insights, safety guidelines, hidden gems, and etiquette for a given city.
+ * Calls the Gemini AI API, falling back to a local mock dataset if the API is offline/unavailable.
+ * 
+ * @param {string} city - The target city name.
+ * @param {string[]} preferences - User travel preferences to customize tips.
+ * @returns {Promise<CompanionInsights>} A promise that resolves to local companion insights.
+ */
 export async function generateLocalCompanionInsights(
   city: string, 
   preferences: string[]

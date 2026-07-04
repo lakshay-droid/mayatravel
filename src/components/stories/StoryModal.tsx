@@ -12,6 +12,12 @@ interface StoryModalProps {
   attractionName: string;
 }
 
+const tabs = [
+  { id: 'lore', label: 'Lore & Folklore' },
+  { id: 'details', label: 'History & Arch' },
+  { id: 'facts', label: 'Facts & Tips' }
+] as const;
+
 /**
  * StoryModal component displays AI-generated stories, folklore, history, and travel tips
  * for a specific attraction.
@@ -83,12 +89,6 @@ export const StoryModal: React.FC<StoryModalProps> = ({
     setIsPlaying(false);
     setAudioProgress(0);
   }, []);
-
-  const tabs = [
-    { id: 'lore', label: 'Lore & Folklore' },
-    { id: 'details', label: 'History & Arch' },
-    { id: 'facts', label: 'Facts & Tips' }
-  ] as const;
 
   return (
     <Modal

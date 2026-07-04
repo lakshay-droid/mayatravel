@@ -2,6 +2,14 @@ import React from 'react';
 import { Camera, Sparkles, Eye } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
+/**
+ * AI AR Explorer Component.
+ * Renders a simulated preview interface for an Augmented Reality heritage walk.
+ * Shows mockup elements including camera viewport, floating AR pins, and controls.
+ * 
+ * @component
+ * @returns {React.ReactElement} The rendered AI AR Explorer component.
+ */
 export const ArExplorer: React.FC = () => {
   return (
     <div className="glass-effect rounded-3xl p-6 md:p-8 border border-slate-100 shadow-premium flex flex-col items-center text-center gap-6 w-full">

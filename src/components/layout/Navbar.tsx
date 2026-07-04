@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Compass, CalendarRange, User, LogOut, Sparkles } from 'lucide-react';
-import { supabase } from '../../services/supabase/supabaseClient';
+import { useAuth } from '../../hooks/useAuth';
 
 /**
  * Navbar component provides sticky header navigation, logo, and active path indicators.
@@ -11,11 +11,12 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const activePath = location.pathname;
+  const { logout } = useAuth();
 
   const handleLogout = useCallback(async () => {
-    await supabase.auth.signOut();
+    await logout();
     navigate('/login');
-  }, [navigate]);
+  }, [logout, navigate]);
 
   const navItems = useMemo(() => [
     { path: '/', label: 'Explore', icon: <Compass size={18} aria-hidden="true" /> },

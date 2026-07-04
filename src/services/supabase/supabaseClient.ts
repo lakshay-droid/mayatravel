@@ -35,6 +35,12 @@ interface MockDB {
   [table: string]: MockRow[] | DemoUser[];
 }
 
+/**
+ * Retrieves the local mock database state from localStorage.
+ * Initializes it with default demo user data if none exists.
+ * 
+ * @returns {MockDB} The parsed mock database object.
+ */
 const getMockDB = (): MockDB => {
   const data = localStorage.getItem(MOCK_STORAGE_KEY);
   if (!data) {
@@ -55,6 +61,12 @@ const getMockDB = (): MockDB => {
   return JSON.parse(data) as MockDB;
 };
 
+/**
+ * Saves the current state of the mock database back to localStorage.
+ * 
+ * @param {MockDB} db - The mock database object to persist.
+ * @returns {void}
+ */
 const saveMockDB = (db: MockDB): void => {
   localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(db));
 };
@@ -64,27 +76,57 @@ interface Filter {
   value: unknown;
 }
 
-// Chainable query builder for Mock Client
+/**
+ * A builder class designed to simulate Supabase query building.
+ * Supports chainable filtering and basic operations such as select, eq, insert, upsert, delete.
+ * 
+ * @class MockQueryBuilder
+ */
 class MockQueryBuilder {
   private table: string;
   private filters: Filter[] = [];
   private client: MockSupabaseClient;
 
+  /**
+   * Constructs a new MockQueryBuilder instance.
+   * 
+   * @param {string} table - The table name.
+   * @param {MockSupabaseClient} client - The reference to the parent client.
+   */
   constructor(table: string, client: MockSupabaseClient) {
     this.table = table;
     this.client = client;
   }
 
+  /**
+   * Simulates selecting columns. Currently a no-op that supports builder chaining.
+   * 
+   * @param {string} [_columns='*'] - Columns to select.
+   * @returns {this} The query builder instance.
+   */
   select(_columns = '*'): this {
     // Return builder to support chaining
     return this;
   }
 
+  /**
+   * Filters results by matching key-value pairs.
+   * 
+   * @param {string} column - Name of the column.
+   * @param {unknown} value - Value to check for equality.
+   * @returns {this} The query builder instance.
+   */
   eq(column: string, value: unknown): this {
     this.filters.push({ column, value });
     return this;
   }
 
+  /**
+   * Inserts records into the simulated database.
+   * 
+   * @param {Record<string, unknown> | Record<string, unknown>[]} values - The records to insert.
+   * @returns {object} An object containing select and then methods for asynchronous execution.
+   */
   insert(values: Record<string, unknown> | Record<string, unknown>[]) {
     const builder = this;
     return {
@@ -123,6 +165,12 @@ class MockQueryBuilder {
     };
   }
 
+  /**
+   * Upserts records (inserts new or updates existing) based on ID/user filters.
+   * 
+   * @param {Record<string, unknown> | Record<string, unknown>[]} values - The records to upsert.
+   * @returns {object} An object containing select and then methods for asynchronous execution.
+   */
   upsert(values: Record<string, unknown> | Record<string, unknown>[]) {
     const builder = this;
     return {
@@ -188,6 +236,11 @@ class MockQueryBuilder {
     };
   }
 
+  /**
+   * Deletes records matching subsequent eq filters.
+   * 
+   * @returns {object} An object containing the eq filter function.
+   */
   delete() {
     const builder = this;
     return {
@@ -207,6 +260,11 @@ class MockQueryBuilder {
     };
   }
 
+  /**
+   * Fetches a single row that matches current filters.
+   * 
+   * @returns {Promise<{ data: MockRow | null; error: Error | null }>} A promise resolving to a single record or an error.
+   */
   async single(): Promise<{ data: MockRow | null; error: Error | null }> {
     const db = getMockDB();
     let rows = (db[this.table] || []) as MockRow[];
@@ -222,6 +280,13 @@ class MockQueryBuilder {
     return { data: null, error: new Error('Row not found') };
   }
 
+  /**
+   * Triggers the async execution of the built query when chained with .then().
+   * Simulates standard Row Level Security (RLS) matching the current user's data.
+   * 
+   * @param {(result: { data: MockRow[] | DemoUser[]; error: Error | null }) => void} resolve - Resolve callback.
+   * @returns {Promise<void>}
+   */
   async then(resolve: (result: { data: MockRow[] | DemoUser[]; error: Error | null }) => void): Promise<void> {
     const db = getMockDB();
     let rows = (db[this.table] || []) as MockRow[];
@@ -240,14 +305,27 @@ class MockQueryBuilder {
   }
 }
 
-// Custom Mock Supabase Client API
+/**
+ * A simulated Supabase Client.
+ * Provides custom authentication and query endpoints to run the app in offline/sandbox mode.
+ * 
+ * @class MockSupabaseClient
+ */
 class MockSupabaseClient {
   private currentUserId: string | null = null;
 
+  /**
+   * Constructs the MockSupabaseClient and triggers the initial session sync.
+   */
   constructor() {
     this.syncSession();
   }
 
+  /**
+   * Syncs internal session state with the browser's storage options (sessionStorage/localStorage).
+   * 
+   * @returns {void}
+   */
   syncSession(): void {
     const session = sessionStorage.getItem('locallens_session');
     if (session) {
@@ -264,12 +342,25 @@ class MockSupabaseClient {
     }
   }
 
+  /**
+   * Retrieves the currently active user ID.
+   * 
+   * @returns {string | null} The active user ID or null if unauthenticated.
+   */
   getCurrentUserId(): string | null {
     this.syncSession();
     return this.currentUserId;
   }
 
+  /**
+   * Mock Authentication services mimicking Supabase GoTrue authentication APIs.
+   */
   auth = {
+    /**
+     * Gets the current user data from session or database.
+     * 
+     * @returns {Promise<{ data: { user: { id: string; email: string; user_metadata: { username: string } } | null }; error: Error | null }>} Active user or error.
+     */
     getUser: async (): Promise<{ data: { user: { id: string; email: string; user_metadata: { username: string } } | null }; error: Error | null }> => {
       this.syncSession();
       if (this.currentUserId) {
@@ -281,6 +372,11 @@ class MockSupabaseClient {
       }
       return { data: { user: null }, error: new Error('No active session') };
     },
+    /**
+     * Retrieves the current authentication session object.
+     * 
+     * @returns {Promise<{ data: { session: unknown }; error: null }>} The active session or null.
+     */
     getSession: async (): Promise<{ data: { session: unknown }; error: null }> => {
       const session = sessionStorage.getItem('locallens_session');
       if (session) {
@@ -288,6 +384,14 @@ class MockSupabaseClient {
       }
       return { data: { session: null }, error: null };
     },
+    /**
+     * Authenticates user using username extracted from email and matched password.
+     * 
+     * @param {object} params - Authentication payload.
+     * @param {string} params.email - The user email.
+     * @param {string} params.password - The user password.
+     * @returns {Promise<{ data: { user: { id: string; email: string; user_metadata: { username: string } } | null; session: unknown }; error: Error | null }>} Auth result.
+     */
     signInWithPassword: async ({ email, password }: { email: string; password: string }): Promise<{ data: { user: { id: string; email: string; user_metadata: { username: string } } | null; session: unknown }; error: Error | null }> => {
       const db = getMockDB();
       const username = email.split('@')[0];
@@ -305,6 +409,11 @@ class MockSupabaseClient {
       }
       return { data: { user: null, session: null }, error: new Error('Invalid credentials') };
     },
+    /**
+     * Signs out the active user, clearing local tokens/session storage.
+     * 
+     * @returns {Promise<{ error: null }>} An object containing error key.
+     */
     signOut: async (): Promise<{ error: null }> => {
       sessionStorage.removeItem('locallens_session');
       sessionStorage.removeItem('locallens_user');
@@ -313,13 +422,31 @@ class MockSupabaseClient {
     }
   };
 
+  /**
+   * Starts a query builder on a mock database table.
+   * 
+   * @param {string} table - Table name.
+   * @returns {MockQueryBuilder} The query builder instance.
+   */
   from(table: string): MockQueryBuilder {
     return new MockQueryBuilder(table, this);
   }
 }
 
-// Export the active client
+/**
+ * Boolean flag indicating if the application is running in mock database mode.
+ * Evaluates to true if either `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` are not set.
+ * 
+ * @type {boolean}
+ */
 export const isMockMode = !supabaseUrl || !supabaseAnonKey;
+
+/**
+ * The initialized Supabase Client.
+ * Automatically switches to a MockSupabaseClient instance if environment keys are missing.
+ * 
+ * @type {import('@supabase/supabase-js').SupabaseClient}
+ */
 export const supabase = isMockMode 
   ? (new MockSupabaseClient() as unknown as ReturnType<typeof createClient>) 
   : createClient(supabaseUrl, supabaseAnonKey);

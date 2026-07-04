@@ -166,7 +166,7 @@ export const Onboarding: React.FC = () => {
 
   const slideVariants = {
     initial: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
-    animate: { x: 0, opacity: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as any } },
+    animate: { x: 0, opacity: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
     exit: (d: number) => ({ x: d > 0 ? -80 : 80, opacity: 0, transition: { duration: 0.3 } }),
   };
 

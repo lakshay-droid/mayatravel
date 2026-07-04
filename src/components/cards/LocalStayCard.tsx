@@ -5,7 +5,7 @@ import type { LocalStay } from '../../types';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
-interface LocalStayCardProps {
+export interface LocalStayCardProps {
   stay: LocalStay;
 }
 
@@ -15,7 +15,7 @@ interface LocalStayCardProps {
  * 
  * @param stay The stay details object
  */
-export const LocalStayCard: React.FC<LocalStayCardProps> = ({ stay }) => {
+export const LocalStayCard = React.memo(({ stay }: LocalStayCardProps) => {
   const [booked, setBooked] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -105,5 +105,6 @@ export const LocalStayCard: React.FC<LocalStayCardProps> = ({ stay }) => {
       </div>
     </motion.div>
   );
-};
+});
+
 export default LocalStayCard;

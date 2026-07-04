@@ -1,11 +1,36 @@
 import React, { useId } from 'react';
 
+/**
+ * Props for the Input component.
+ * 
+ * @interface InputProps
+ * @extends {React.InputHTMLAttributes<HTMLInputElement>}
+ */
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /**
+   * The text label displayed above the input field.
+   * @type {string}
+   */
   label?: string;
+  /**
+   * Validation error message. If provided, the input displays a red border and this message is shown below the input.
+   * @type {string}
+   */
   error?: string;
+  /**
+   * Supporting descriptive text shown below the input field when there is no validation error.
+   * @type {string}
+   */
   helperText?: string;
 }
 
+/**
+ * A highly accessible, custom-styled input field supporting labels, error validation states, and helper descriptions.
+ * 
+ * @param {InputProps} props - The input properties.
+ * @param {React.ForwardedRef<HTMLInputElement>} ref - Forwarded reference to the DOM input element.
+ * @returns {React.ReactElement} The rendered Input component.
+ */
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   label,
   error,

@@ -1,17 +1,20 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Map, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { ATTRACTIONS_BY_CITY, LOCAL_STAYS_BY_CITY } from '../../constants/mockData';
 import type { Attraction } from '../../types';
-import { InteractiveMap } from '../../components/map/InteractiveMap';
 import { LocalCompanion } from '../../components/planner/LocalCompanion';
 import { LocalStayCard } from '../../components/cards/LocalStayCard';
 import { StoryModal } from '../../components/stories/StoryModal';
 import { AttractionCard } from '../../components/explore/AttractionCard';
 import { AttractionSheet } from '../../components/explore/AttractionSheet';
 import { CityHero } from '../../components/explore/CityHero';
+
+const InteractiveMap = React.lazy(() =>
+  import('../../components/map/InteractiveMap').then(m => ({ default: m.InteractiveMap }))
+);
 
 const CATEGORIES = ['All', 'Temples', 'Culture', 'Museums', 'Hidden Gems', 'Food', 'Adventure'];
 const AVAILABLE_CITIES = ['Dehradun', 'Jaipur', 'Varanasi', 'Goa'];
@@ -179,12 +182,14 @@ export const Home: React.FC = () => {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="mt-3 overflow-hidden rounded-2xl"
           >
-            <InteractiveMap
-              city={city}
-              attractions={filteredAttractions}
-              onSelectAttraction={setSelectedAttraction}
-              selectedAttraction={selectedAttraction}
-            />
+            <Suspense fallback={<div className="h-[400px] w-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg">Loading Map...</div>}>
+              <InteractiveMap
+                city={city}
+                attractions={filteredAttractions}
+                onSelectAttraction={setSelectedAttraction}
+                selectedAttraction={selectedAttraction}
+              />
+            </Suspense>
           </motion.div>
         )}
       </section>

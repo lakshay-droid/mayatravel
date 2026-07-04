@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase, isMockMode } from '../services/supabase/supabaseClient';
+
 
 export interface AuthUser {
   id: string;
@@ -7,6 +8,12 @@ export interface AuthUser {
   email?: string;
 }
 
+/**
+ * Hook to manage authentication state and actions (login, signup, logout).
+ * Handles both Supabase Auth and a local database fallback for testing/offline support.
+ *
+ * @returns An object containing the current user, loading state, authentication functions, and authenticated status.
+ */
 export const useAuth = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -23,7 +30,15 @@ export const useAuth = () => {
   }, []);
 
   // ─── Login (Supabase Auth / Demo Users Fallback) ──────────────────────────
-  const login = async (
+  /**
+   * Log in a user using their username and password.
+   * Supports local/mock mode using the demo_users table or live Supabase Auth.
+   *
+   * @param usernameInput - The entered username or email address.
+   * @param passwordInput - The entered password.
+   * @returns A promise resolving to an object indicating success or failure with an error message.
+   */
+  const login = useCallback(async (
     usernameInput: string,
     passwordInput: string
   ): Promise<{ success: boolean; error?: string }> => {
@@ -87,10 +102,43 @@ export const useAuth = () => {
       const errMsg = err instanceof Error ? err.message : 'Authentication failed.';
       return { success: false, error: errMsg };
     }
-  };
+  }, []);
+
+  // Mock signup — writes to localStorage MockDB when Supabase is unavailable
+  /**
+   * Internal helper to register a user locally when live Supabase registration is unavailable or in mock mode.
+   *
+   * @param username - The username to register.
+   * @param password - The password to register.
+   * @returns A promise resolving to an object indicating success or failure.
+   */
+  const signupMock = useCallback(async (
+    username: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const uid = `usr-${Date.now()}`;
+      await supabase.from('demo_users').insert({ id: uid, username, password });
+      const authUser: AuthUser = { id: uid, username };
+      sessionStorage.setItem('locallens_user', JSON.stringify(authUser));
+      setUser(authUser);
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Signup failed. Please try again.' };
+    }
+  }, []);
 
   // ─── Signup (Supabase Auth + demo_users insert) ───────────────────────────
-  const signup = async (
+  /**
+   * Register a new user with email, password, and username.
+   * Automatically handles local fallback or mock environment if live authentication fails.
+   *
+   * @param email - The email address for the new account.
+   * @param password - The password for the new account.
+   * @param username - The username for the new account.
+   * @returns A promise resolving to an object indicating success or failure.
+   */
+  const signup = useCallback(async (
     email: string,
     password: string,
     username: string
@@ -142,34 +190,22 @@ export const useAuth = () => {
       // Full offline fallback
       return await signupMock(usernameTrimmed, password);
     }
-  };
-
-  // Mock signup — writes to localStorage MockDB when Supabase is unavailable
-  const signupMock = async (
-    username: string,
-    password: string
-  ): Promise<{ success: boolean; error?: string }> => {
-    try {
-      const uid = `usr-${Date.now()}`;
-      await supabase.from('demo_users').insert({ id: uid, username, password });
-      const authUser: AuthUser = { id: uid, username };
-      sessionStorage.setItem('locallens_user', JSON.stringify(authUser));
-      setUser(authUser);
-      return { success: true };
-    } catch {
-      return { success: false, error: 'Signup failed. Please try again.' };
-    }
-  };
+  }, [signupMock]);
 
   // ─── Logout ───────────────────────────────────────────────────────────────
-  const logout = async () => {
+  /**
+   * Log out the current user, clearing the Supabase session, sessionStorage, and resetting local state.
+   *
+   * @returns A promise that resolves when the logout procedure is complete.
+   */
+  const logout = useCallback(async () => {
     try {
       await supabase.auth.signOut();
     } catch { /* ignore */ } finally {
       sessionStorage.removeItem('locallens_user');
       setUser(null);
     }
-  };
+  }, []);
 
   return {
     user,

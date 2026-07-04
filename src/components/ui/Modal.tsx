@@ -19,6 +19,14 @@ interface ModalProps {
  * @param children Content to render inside body
  * @param size Responsive width constraint
  */
+const sizeWidths: Record<'sm' | 'md' | 'lg' | 'xl' | 'full', string> = {
+  sm: 'max-w-md',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+  full: 'max-w-full m-4 h-[calc(100vh-2rem)]',
+};
+
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -56,14 +64,6 @@ export const Modal: React.FC<ModalProps> = ({
       }
     }
   }, [isOpen]);
-
-  const sizeWidths = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
-    full: 'max-w-full m-4 h-[calc(100vh-2rem)]',
-  };
 
   return (
     <AnimatePresence>

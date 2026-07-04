@@ -68,4 +68,17 @@ describe('useAuth Hook', () => {
     expect(result.current.user).toBeNull();
     expect(result.current.isAuthenticated).toBe(false);
   });
+
+  it('should maintain stable references for login, signup, and logout functions', () => {
+    const { result, rerender } = renderHook(() => useAuth());
+    const initialLogin = result.current.login;
+    const initialSignup = result.current.signup;
+    const initialLogout = result.current.logout;
+
+    rerender();
+
+    expect(result.current.login).toBe(initialLogin);
+    expect(result.current.signup).toBe(initialSignup);
+    expect(result.current.logout).toBe(initialLogout);
+  });
 });

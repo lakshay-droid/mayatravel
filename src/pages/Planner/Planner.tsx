@@ -295,28 +295,36 @@ export const Planner: React.FC = () => {
 
                 {/* Activities timeline */}
                 <div className="flex flex-col gap-3">
-                  {itinerary[activeDayTab].activities?.map((act) => (
-                    <div key={`${act.time}-${act.name || act.activityName}`} className="flex gap-3">
-                      <div className="flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-text-muted w-12 text-right shrink-0">{act.time}</span>
-                      </div>
-                      <div className="flex flex-col flex-1 min-w-0">
-                        <div className="w-px bg-white/10 self-center h-full absolute" />
-                        <div className="glass-card p-3 relative">
-                          <div className="flex items-center justify-between mb-0.5">
-                            <span className="font-bold text-sm text-text-primary">{act.name || act.activityName}</span>
-                            {act.cost && (
-                              <span className="text-[11px] text-emerald-400 font-semibold">{act.cost}</span>
+                  {(() => {
+                    const activeDay = itinerary[activeDayTab];
+                    const activitiesToRender = activeDay.activities && activeDay.activities.length > 0
+                      ? activeDay.activities
+                      : [activeDay.morning, activeDay.afternoon, activeDay.evening].filter(
+                          (act): act is NonNullable<typeof act> => act !== undefined && act !== null
+                        );
+                    return activitiesToRender.map((act) => (
+                      <div key={`${act.time}-${act.name || act.activityName}`} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <span className="text-[10px] font-bold text-text-muted w-12 text-right shrink-0">{act.time}</span>
+                        </div>
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <div className="w-px bg-white/10 self-center h-full absolute" />
+                          <div className="glass-card p-3 relative">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <span className="font-bold text-sm text-text-primary">{act.name || act.activityName}</span>
+                              {act.cost && (
+                                <span className="text-[11px] text-emerald-400 font-semibold">{act.cost}</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-text-secondary leading-relaxed">{act.description}</p>
+                            {act.duration && (
+                              <span className="text-[10px] text-text-muted mt-1 inline-block">{act.duration}</span>
                             )}
                           </div>
-                          <p className="text-xs text-text-secondary leading-relaxed">{act.description}</p>
-                          {act.duration && (
-                            <span className="text-[10px] text-text-muted mt-1 inline-block">{act.duration}</span>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
 
                 {/* Local tip */}

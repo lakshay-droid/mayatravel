@@ -6,10 +6,27 @@ import { Compass, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
+/**
+ * Props for the PageContainer component.
+ * 
+ * @interface PageContainerProps
+ */
 interface PageContainerProps {
+  /**
+   * The child components or content to be rendered inside the page container.
+   * @type {React.ReactNode}
+   */
   children: React.ReactNode;
 }
 
+/**
+ * A layout wrapper component that conditionally displays the application frame.
+ * For login and onboarding routes, it renders a fullscreen plain layout.
+ * For standard application routes, it includes a sticky header, bottom navigation bar, and animations.
+ * 
+ * @param {PageContainerProps} props - Props for configuring the PageContainer.
+ * @returns {React.ReactElement} The rendered PageContainer element.
+ */
 export const PageContainer: React.FC<PageContainerProps> = ({ children }) => {
   const location = useLocation();
   const path = location.pathname;

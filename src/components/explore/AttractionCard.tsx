@@ -3,11 +3,31 @@ import { motion } from 'framer-motion';
 import { MapPin, Clock, Star, Sparkles } from 'lucide-react';
 import type { Attraction } from '../../types';
 
-interface AttractionCardProps {
+export interface AttractionCardProps {
   attraction: Attraction;
   onTap: (attraction: Attraction) => void;
   index?: number;
 }
+
+const categoryColors: Record<string, string> = {
+  Temples: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+  Culture: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+  Museums: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+  'Hidden Gems': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+  Food: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+  Adventure: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+  default: 'bg-primary/20 text-primary-light border-primary/30',
+};
+
+const getStableRating = (name: string): string => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const positiveHash = Math.abs(hash);
+  const rating = 4.0 + (positiveHash % 10) * 0.1;
+  return rating.toFixed(1);
+};
 
 /**
  * AttractionCard component renders a button containing card information of a specific travel attraction.
@@ -16,17 +36,7 @@ interface AttractionCardProps {
  * @param onTap Callback when the card is tapped/clicked
  * @param index Optional list index for staggered animation delays
  */
-export const AttractionCard: React.FC<AttractionCardProps> = ({ attraction, onTap, index = 0 }) => {
-  const categoryColors: Record<string, string> = {
-    Temples: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    Culture: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-    Museums: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    'Hidden Gems': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-    Food: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
-    Adventure: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
-    default: 'bg-primary/20 text-primary-light border-primary/30',
-  };
-
+export const AttractionCard = React.memo(({ attraction, onTap, index = 0 }: AttractionCardProps) => {
   const colorClass = categoryColors[attraction.category] || categoryColors.default;
 
   return (
@@ -80,13 +90,13 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({ attraction, onTa
             </span>
             <span className="flex items-center gap-1 text-amber-400 text-xs ml-auto">
               <Star size={11} fill="currentColor" aria-hidden="true" />
-              {(Math.random() * 0.8 + 4.0).toFixed(1)}
+              {getStableRating(attraction.name)}
             </span>
           </div>
         </div>
       </div>
     </motion.button>
   );
-};
+});
 
 export default AttractionCard;
